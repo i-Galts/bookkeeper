@@ -1,19 +1,21 @@
 import sys
 from PySide6 import QtWidgets, QtGui
 
-from edit_panel import CategoryChoice
+from bookkeeper.view.edit_panel import CategoryChoice
 
 class ExpensesTable(QtWidgets.QTabWidget):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, cat_list: list[str], *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self._expenses_table = QtWidgets.QTableWidget()
-        self._expenses_table.setColumnCount(4)
-        self._expenses_table.setRowCount(100)
-        self._expenses_table.setHorizontalHeaderLabels(
+        self.category_list = cat_list
+
+        self.expenses_table = QtWidgets.QTableWidget()
+        self.expenses_table.setColumnCount(4)
+        self.expenses_table.setRowCount(100)
+        self.expenses_table.setHorizontalHeaderLabels(
             "Дата Сумма Категория Комментарий".split())
         
-        self.header = self._expenses_table.horizontalHeader()
+        self.header = self.expenses_table.horizontalHeader()
         self.header.setSectionResizeMode(
             0, QtWidgets.QHeaderView.ResizeToContents)
         self.header.setSectionResizeMode(
@@ -23,20 +25,30 @@ class ExpensesTable(QtWidgets.QTabWidget):
         self.header.setSectionResizeMode(
             3, QtWidgets.QHeaderView.Stretch)
         
-        self._expenses_table.setEditTriggers(
+        self.expenses_table.setEditTriggers(
             QtWidgets.QAbstractItemView.NoEditTriggers)
-        self._expenses_table.verticalHeader().hide()
+        self.expenses_table.verticalHeader().hide()
 
-    def set_data(self, data: list[list[str]]) -> None:
-        for i, row in enumerate(data):
-         for j, x in enumerate(row):
-            self._expenses_table.setItem(
-                i, j,
-                QtWidgets.QTableWidgetItem(x.capitalize())
+        self.set_category_list()
+
+    # def set_data(self, data: list[list[str]]) -> None:
+    #     for i, row in enumerate(data):
+    #      for j, x in enumerate(row):
+    #         self.expenses_table.setItem(
+    #             i, j,
+    #             QtWidgets.QTableWidgetItem(x.capitalize())
+    #         )
+
+    def set_category_list(self) -> None:
+        for i, row in enumerate(self.category_list):
+            for j, x in enumerate(row):
+                self.expenses_table.setItem(
+                    i, j,
+                    QtWidgets.QTableWidgetItem(x.capitalize())
             )
 
     def create(self) -> QtWidgets.QTableWidget:
-       return self._expenses_table
+       return self.expenses_table
     
 class ExpenseInput(QtWidgets.QWidget):
     def __init__(self, *args, **kwargs):
@@ -99,10 +111,6 @@ class ExpensesListWidget(QtWidgets.QDialog):
         ln = ExpenseInput()
         self.lines.append(ln)
         self.main_layout.addWidget(ln)
-
-    def changeEvent(self, event) -> None:
-        if all(line.is_filled() for line in self.lines):
-            self.add_line()
 
     def save_editted(self):
         print("Saved!")

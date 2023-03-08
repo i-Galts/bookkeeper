@@ -1,13 +1,13 @@
 import sys
 from PySide6 import QtWidgets, QtGui
 
-from bookkeeper.view.edit_panel import CategoryChoice
+from bookkeeper.view.expenses_edit_panel import CategoryChoice
 
 class ExpensesTable(QtWidgets.QTabWidget):
-    def __init__(self, cat_list: list[str], *args, **kwargs):
+    def __init__(self, exp_list: list[str], *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.category_list = cat_list
+        self.expense_list = exp_list
 
         self.expenses_table = QtWidgets.QTableWidget()
         self.expenses_table.setColumnCount(4)
@@ -29,18 +29,10 @@ class ExpensesTable(QtWidgets.QTabWidget):
             QtWidgets.QAbstractItemView.NoEditTriggers)
         self.expenses_table.verticalHeader().hide()
 
-        self.set_category_list()
+        self.set_expense_list()
 
-    # def set_data(self, data: list[list[str]]) -> None:
-    #     for i, row in enumerate(data):
-    #      for j, x in enumerate(row):
-    #         self.expenses_table.setItem(
-    #             i, j,
-    #             QtWidgets.QTableWidgetItem(x.capitalize())
-    #         )
-
-    def set_category_list(self) -> None:
-        for i, row in enumerate(self.category_list):
+    def set_expense_list(self) -> None:
+        for i, row in enumerate(self.expense_list):
             for j, x in enumerate(row):
                 self.expenses_table.setItem(
                     i, j,

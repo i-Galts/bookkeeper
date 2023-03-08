@@ -1,14 +1,14 @@
 import sys
 
 from bookkeeper.models.category import Category
-# from bookkeeper.models.expense import Expense
+from bookkeeper.models.expense import Expense
 from bookkeeper.models.budget import Budget
 
 from PySide6 import QtWidgets, QtCore
 
 from bookkeeper.view.main_window import BookkeeperMainWindow
 
-from typing import Protocol
+from typing import Protocol, Callable
 
 # У MainView должны быть реализованы эти методы!
 class AbstractView(Protocol):
@@ -24,31 +24,52 @@ class AbstractView(Protocol):
     def show_category_choice_widget() -> None:
         pass
 
-class BookkeeperMainView:
-    def __init__(self, 
-                 window: BookkeeperMainWindow):
-        self.window = window
+    def register_cat_modifier(
+             self,
+             handler: Callable[[Category], None]) -> None:
+        pass
 
-    def set_category_list(self, lst: list[Category]) -> None:
-        #cat_to_str = [str(cat) for cat in lst.split()]
-        self.window.create_expenses_table(lst)
+    def register_cat_adder(
+            self,
+            handler: Callable[[Category], None]) -> None:
+        pass
 
-    def show_budget_widget(self) -> None:
-        self.window.create_budget_table()
+# class BookkeeperMainView:
+#     def __init__(self, 
+#                  window: BookkeeperMainWindow):
+#         self.window = window
 
-    def show_amount_edit_widget(self) -> None:
-        self.window.create_amount_edit_widget()
+#     # def set_category_list(self, cat_list: list[Category]) -> None:
+#     #     #cat_to_str = [str(cat) for cat in lst.split()]
 
-    def show_category_choice_widget(self) -> None:
-        self.window.create_category_choice_widget()
+#     def set_expense_list(self, exp_list: list[Expense]) -> None:
+#         #exp_to_str = [str(exp) for cat in exp_list.split()]
+#         self.window.create_expenses_table(exp_list)
 
-def handle_error(widget, handler):
-    def inner(*args, **kwargs):
-        try:
-            handler(*args, **kwargs)
-        except ValidationError as ex:
-            QtWidgets.QMessageBox.critical(widget, 'Ошибка', str(ex))
-    return inner
+#     def show_budget_widget(self) -> None:
+#         self.window.create_budget_table()
+
+#     def show_expense_edit_panel(self) -> None:
+#         self.window.create_expense_edit_panel()
+
+    # def show_category_choice_widget(self) -> None:
+    #     self.window.create_category_choice_widget()
+
+    # def register_expense_adder(
+    #         self,
+    #         handler: Callable[[Category], None]) -> None:
+    #     pass
+
+
+    # def register_cat_modifier(
+    #          self,
+    #          handler: Callable[[Category], None]) -> None:
+    #     self.cat_modifier = handle_error(self, handler)
+
+    # def register_cat_adder(
+    #         self,
+    #         handler: Callable[[Category], None]) -> None:
+    #     self.cat_adder = handle_error(self, handler)
 
 class Bookkeeper:
     """
@@ -61,41 +82,36 @@ class Bookkeeper:
                  #repo_factory) -> None: # repo - идея, чтобы не передавать какой-то конкретный репо
 
         self.view = view
+        self.view.register_expense_adder(self.add_expense)
         # self.category_repository = \
         #         repo_factory.get(Category) # т.е. нужен спец. метод этого класса repo_factory
         # self.cats = self.category_repository.get_all()
-        self.cats = [
-            ['2023-01-09 15:09:00', '7.49', 'Хозтовары', 'Пакет на кассе'],
-            ['2023-01-09 15:09:00', '104.99', 'Кефир', 'Длинное-предлинное сообщение']
+        self.exps = [
+            Expense(8, 2, comment='Пакет на кассе'),
+            Expense(105, 4, comment='Длинное-предлинное сообщение')
         ]
-        self.view.set_category_list(self.cats)
+        # self.exps = [
+        #     ['2023-01-09 15:09:00', '7.49', 'Хозтовары', 'Пакет на кассе'],
+        #     ['2023-01-09 15:09:00', '104.99', 'Кефир', 'Длинное-предлинное сообщение']
+        # ]
+        self.view.set_expense_list(self.exps)
         self.view.show_budget_widget()
-        self.view.show_amount_edit_widget()
-        self.view.show_category_choice_widget()
+        self.view.show_expense_edit_panel()
 
-    # def provide_with_category_list(self):
-    #     # take from repo...
-    #     # self.category_repository = \
-    #     #         repo_factory.get(Category) # т.е. нужен спец. метод этого класса repo_factory
+    def add_expense(self, amount: int, comment: str) -> None:
+        print(amount, comment)
+        exp = Expense(amount, 10, comment=comment)
+        # (handle error if smth wrong in input)
+        # save to exp_repository
+        self.exps.append(exp)
+        print(self.exps)
+        self.view.set_expense_list(self.exps)
+
+    # def modify_cat(self, cat: Category) -> None:
+    #     # self.category_repository.update(cat)
     #     # self.cats = self.category_repository.get_all()
-    #     self.cats = [
-    #         ['2023-01-09 15:09:00', '7.49', 'Хозтовары', 'Пакет на кассе'],
-    #         ['2023-01-09 15:09:00', '104.99', 'Кефир', 'Длинное-предлинное сообщение']
-    #     ]
+    #     self.cats.append(['2023-01-09 15:09:00', '43.67', 'Бублик'])
     #     self.view.set_category_list(self.cats)
-
-        
-        # main_window.some_method(...)
-
-    # def register_cat_modifier(
-    #          self,
-    #          handler: Callable[[Category], None]) -> None:
-    #     self.cat_modifier = handle_error(self, handler)
-
-    # def register_cat_adder(
-    #         self,
-    #         handler: Callable[[Category], None]) -> None:
-    #     self.cat_adder = handle_error(self, handler)
 
     # def add_category(self):
     #     # получение данных из формочки
@@ -128,8 +144,8 @@ if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
 
     window = BookkeeperMainWindow()
-    view = BookkeeperMainView(window)
-    bookkeeper = Bookkeeper(view)
+    # view = BookkeeperMainView(window)
+    bookkeeper = Bookkeeper(window)
     #bookkeeper.provide_with_category_list()
     window.show()
     sys.exit(app.exec())

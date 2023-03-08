@@ -11,13 +11,35 @@ class AmountEdit(QtWidgets.QWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.amount_edit = widget_with_label(
+        self.amount = QtWidgets.QLineEdit('0')
+
+        self.layout = widget_with_label(
             'Сумма',
-            QtWidgets.QLineEdit('0')
+            self.amount
         )
 
     def create(self) -> QtWidgets.QHBoxLayout:
-        return self.amount_edit
+        return self.layout
+    
+    def get_amount(self) -> int:
+        return int(self.amount.text()) or 0
+    
+class CommentEdit(QtWidgets.QWidget):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.comment_edit = QtWidgets.QLineEdit('введите комментарий')
+
+        self.layout = widget_with_label(
+            'Комментарий',
+            self.comment_edit
+        )
+
+    def create(self) -> QtWidgets.QHBoxLayout:
+        return self.layout
+    
+    def get_comment(self) -> str:
+        return self.comment_edit.text() or ''
     
 class CategoryChoice(QtWidgets.QWidget):
     def __init__(self, *args, **kwargs):
@@ -36,6 +58,9 @@ class CategoryChoice(QtWidgets.QWidget):
 
     def create(self) -> QtWidgets.QHBoxLayout:
         return self.category_choice
+    
+    def get_category(self) -> str:
+        return self.combobox.text() or ''
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)

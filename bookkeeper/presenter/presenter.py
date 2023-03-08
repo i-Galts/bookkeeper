@@ -122,6 +122,7 @@ class Bookkeeper:
         self.view.register_expense_adder(self.add_expense)
         self.expense_repository = repo_factory.get(Expense)
         self.exps = self.expense_repository.get_all()
+        #print(self.exps)
         # self.exps = [
         #     Expense(8, 2, comment='Пакет на кассе'),
         #     Expense(105, 4, comment='Длинное-предлинное сообщение')
@@ -135,12 +136,12 @@ class Bookkeeper:
         self.view.show_expense_edit_panel()
 
     def add_expense(self, amount: int, comment: str) -> None:
-        print(amount, comment)
+        #print(amount, comment)
         exp = Expense(amount, 10, comment=comment)
         # (handle error if smth wrong in input)
         # save to exp_repository
         self.exps.append(exp)
-        print(self.exps)
+        #print(self.exps)
         self.view.set_expense_list(self.exps)
 
     # def modify_cat(self, cat: Category) -> None:

@@ -10,10 +10,10 @@ class ExpensesTable(QtWidgets.QTabWidget):
         self.expense_list = exp_list
 
         self.expenses_table = QtWidgets.QTableWidget()
-        self.expenses_table.setColumnCount(4)
+        self.expenses_table.setColumnCount(5)
         self.expenses_table.setRowCount(100)
         self.expenses_table.setHorizontalHeaderLabels(
-            "Дата Сумма Категория Комментарий".split())
+            "Дата добавления, Фактическая дата, Сумма, Категория, Комментарий".split(','))
         
         self.header = self.expenses_table.horizontalHeader()
         self.header.setSectionResizeMode(

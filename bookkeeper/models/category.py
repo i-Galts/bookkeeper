@@ -7,7 +7,6 @@ from typing import Iterator
 
 from bookkeeper.repository.abstract_repository import AbstractRepository
 
-
 @dataclass
 class Category:
     """
@@ -15,7 +14,7 @@ class Category:
     родителя (категория, подкатегорией которой является данная) в атрибуте parent.
     У категорий верхнего уровня parent = None
     """
-    name: str
+    name: str = ''
     parent: int | None = None
     pk: int = 0
 
@@ -116,3 +115,8 @@ class Category:
             repo.add(cat)
             created[child] = cat
         return list(created.values())
+    
+def convert_category(s: bytes):
+    sp = s.split(b",")
+    pk, name, parent = int(sp[0]), str(sp[1]), int(sp[2])
+    return Category(name, parent, pk)

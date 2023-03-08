@@ -76,7 +76,6 @@ class BookkeeperMainWindow(QtWidgets.QMainWindow):
         self.expenses_table = ExpensesTable(exp_list)
         self.expenses_table_layout.addWidget(self.expenses_table.create())
         p = (self.expenses_table_layout.currentIndex() + 1) % self.expenses_table_layout.count()
-        print(p)
         self.expenses_table_layout.setCurrentIndex(p)
         # self.expenses_table_layout.setCurrentIndex(
         #         (self.expenses_table_layout.currentIndex() + 1) % self.expenses_table_layout.count())

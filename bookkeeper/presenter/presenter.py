@@ -4,11 +4,48 @@ from bookkeeper.models.category import Category
 from bookkeeper.models.expense import Expense
 from bookkeeper.models.budget import Budget
 
+from bookkeeper.repository.sqlite_repository import SQLiteRepository
+from bookkeeper.repository.memory_repository import MemoryRepository
+
 from PySide6 import QtWidgets, QtCore
 
 from bookkeeper.view.main_window import BookkeeperMainWindow
 
 from typing import Protocol, Callable
+
+class RepositoryFactory:
+    """
+    Класс, предоставляющий фабрику репозиториев.
+    При создании фабрики указывается тип repo_type:
+    либо MemoryRepository, либо SQLiteRepository.
+    """
+    def __init__(self, repo_type: type):
+        # self.repo_dict = {}
+        if (repo_type == SQLiteRepository):
+            self.repo_dict = {
+                Category: SQLiteRepository('category_repo.db', Category),
+                Expense:  SQLiteRepository('expense_repo.db', Expense),
+                Budget:   SQLiteRepository('budget_repo.db', Budget)
+            }
+            # self.repo_dict[Category] = SQLiteRepository('category_repo.db', Category)
+            # self.repo_dict[Expense]  = SQLiteRepository('expense_repo.db', Expense)
+            # self.repo_dict[Budget]   = SQLiteRepository('budget_repo.db', Budget)
+        else:
+            self.repo_dict = {
+                Category: MemoryRepository(),
+                Expense:  MemoryRepository(),
+                Budget:   MemoryRepository()   
+            }
+            # self.repo_dict[Category] = MemoryRepository()
+            # self.repo_dict[Expense]  = MemoryRepository()
+            # self.repo_dict[Budget]   = MemoryRepository()
+        
+    def get(self, model_cls: type):
+        """
+        Возвращает репозиторий для каждой
+        конкретной модели.
+        """
+        return self.repo_dict[model_cls]
 
 # У MainView должны быть реализованы эти методы!
 class AbstractView(Protocol):
@@ -78,18 +115,17 @@ class Bookkeeper:
     Определены обработчики при работе с моделями.
     """
     def __init__(self, 
-                 view: AbstractView): # с каким отображением будем работать
-                 #repo_factory) -> None: # repo - идея, чтобы не передавать какой-то конкретный репо
+                 view: AbstractView, # с каким отображением будем работать
+                 repo_factory: RepositoryFactory) -> None: # repo - идея, чтобы не передавать какой-то конкретный репо
 
         self.view = view
         self.view.register_expense_adder(self.add_expense)
-        # self.category_repository = \
-        #         repo_factory.get(Category) # т.е. нужен спец. метод этого класса repo_factory
-        # self.cats = self.category_repository.get_all()
-        self.exps = [
-            Expense(8, 2, comment='Пакет на кассе'),
-            Expense(105, 4, comment='Длинное-предлинное сообщение')
-        ]
+        self.expense_repository = repo_factory.get(Expense)
+        self.exps = self.expense_repository.get_all()
+        # self.exps = [
+        #     Expense(8, 2, comment='Пакет на кассе'),
+        #     Expense(105, 4, comment='Длинное-предлинное сообщение')
+        # ]
         # self.exps = [
         #     ['2023-01-09 15:09:00', '7.49', 'Хозтовары', 'Пакет на кассе'],
         #     ['2023-01-09 15:09:00', '104.99', 'Кефир', 'Длинное-предлинное сообщение']
@@ -142,10 +178,10 @@ if __name__ == "__main__":
     # 6. По итогу отрисовать окно
 
     app = QtWidgets.QApplication(sys.argv)
-
     window = BookkeeperMainWindow()
+    repo_factory = RepositoryFactory(SQLiteRepository)
     # view = BookkeeperMainView(window)
-    bookkeeper = Bookkeeper(window)
+    bookkeeper = Bookkeeper(window, repo_factory)
     #bookkeeper.provide_with_category_list()
     window.show()
     sys.exit(app.exec())

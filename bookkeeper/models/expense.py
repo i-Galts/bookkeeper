@@ -17,26 +17,23 @@ class Expense:
     comment - комментарий
     pk - id записи в базе данных
     """
-    amount: int = 1
-    category: int = 1
-    expense_date: datetime = field(default_factory=datetime.now)
     added_date: datetime = field(default_factory=datetime.now)
+    expense_date: datetime = field(default_factory=datetime.now)
+    amount: int = 1
+    category: str = ''
     comment: str = ''
     pk: int = 0
 
     def __repr__(self):
-        return f'{"{:%B %d %Y}".format(self.expense_date.date())}, \
-                             {self.amount}, {self.category}, {self.comment}'
+        return f'{str(self.added_date.date())}, {str(self.expense_date.date()).strip()},' \
+                f' {self.amount}, {self.category}, {self.comment}'
 
-    
-def convert_expense(s: bytes):
-    sp = s.split(",")
-    pk, amount, cat, exp_date, add_date, comment = \
-            int(sp[0]), int(sp[1]), int(sp[2]), \
-                datetime(sp[3]), datetime(sp[4]), str(sp[5])
-    return Expense(amount, cat, exp_date, exp_date, add_date, comment, pk)
+    # def __repr__(self):
+    #     return f'{"{:%B %d %Y}".format(self.added_date.date()).strip()}, \
+    #                       {"{:%B %d %Y}".format(self.expense_date.date()).strip()}, \
+    #                         {self.amount}, {self.category}, {self.comment}'
 
 if __name__ == "__main__":
-    exp = Expense(100, 1)
+    exp = Expense(amount=100, category='Milk', comment='lalala')
     print(exp)
     

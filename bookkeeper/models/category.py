@@ -18,6 +18,9 @@ class Category:
     parent: int | None = None
     pk: int = 0
 
+    def __repr__(self):
+        return f'{self.name}, {self.parent}'
+
     def get_parent(self,
                    repo: AbstractRepository['Category']) -> 'Category | None':
         """

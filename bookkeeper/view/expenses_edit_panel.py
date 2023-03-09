@@ -42,14 +42,12 @@ class CommentEdit(QtWidgets.QWidget):
         return self.comment_edit.text() or ''
     
 class CategoryChoice(QtWidgets.QWidget):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, cat_list: list[str], *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.combobox = QtWidgets.QComboBox()
-        self.combobox.addItem('Продукты')
-        self.combobox.addItem('Кефир')
-        self.combobox.addItem('Хлеб')
-        self.combobox.addItem('Сыр')
+        for cat in cat_list:
+            self.combobox.addItem(cat.split(',')[0].capitalize())
 
         self.category_choice = widget_with_label(
             'Категория',
@@ -60,7 +58,7 @@ class CategoryChoice(QtWidgets.QWidget):
         return self.category_choice
     
     def get_category(self) -> str:
-        return self.combobox.text() or ''
+        return self.combobox.currentText()  #itemData(self.combobox.currentIndex())
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)

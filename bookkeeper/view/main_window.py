@@ -26,11 +26,13 @@ class BookkeeperMainWindow(QtWidgets.QMainWindow):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.setWindowTitle("PyBookKeeper App")
-        self.resize(700, 900)
+        self.resize(800, 900)
         self.central_widget = QtWidgets.QTabWidget()
         self.setCentralWidget(self.central_widget)
         # to do: add tooltips for different widgets
         self.vertical_layout = QtWidgets.QVBoxLayout()
+
+        self.create_menu()
 
         self.expenses_table_layout = QtWidgets.QStackedLayout()
 
@@ -40,7 +42,6 @@ class BookkeeperMainWindow(QtWidgets.QMainWindow):
 
         self.amount_edit = AmountEdit()
         self.comment_edit = CommentEdit()
-        self.cat_choice = CategoryChoice()
 
         # self.button_layout = QtWidgets.QHBoxLayout()
 
@@ -52,9 +53,9 @@ class BookkeeperMainWindow(QtWidgets.QMainWindow):
         self.file_menu = self.menuBar().addMenu("Файл")
         self.edit_menu = self.menuBar().addMenu("Редактировать")
 
-        self.edit_expenses_action = QtGui.QAction("Правка расходов", self)
-        self.edit_expenses_action.triggered.connect(self.edit_expense_button_clicked)
-        self.edit_menu.addAction(self.edit_expenses_action)
+        self.edit_category_action = QtGui.QAction("Правка категорий", self)
+        self.edit_category_action.triggered.connect(self.edit_category_button_clicked)
+        self.edit_menu.addAction(self.edit_category_action)
 
         self.edit_budget_action = QtGui.QAction("Правка бюджета", self)
         self.edit_menu.addAction(self.edit_budget_action)
@@ -65,24 +66,22 @@ class BookkeeperMainWindow(QtWidgets.QMainWindow):
 
     @QtCore.Slot()
     def edit_expense_button_clicked(self):
-        ExpensesListWidget()
-
-    # def create_expenses_table(self, exp_list: list[str]):
-    #     self.vertical_layout.addWidget(QtWidgets.QLabel("Последние расходы"))
-    #     self.expenses_table = ExpensesTable(exp_list)
-    #     self.vertical_layout.addWidget(self.expenses_table.create())
+        pass
     
     def refresh_expenses_table(self, exp_list: list[str]):
         self.expenses_table = ExpensesTable(exp_list)
         self.expenses_table_layout.addWidget(self.expenses_table.create())
         p = (self.expenses_table_layout.currentIndex() + 1) % self.expenses_table_layout.count()
         self.expenses_table_layout.setCurrentIndex(p)
-        # self.expenses_table_layout.setCurrentIndex(
-        #         (self.expenses_table_layout.currentIndex() + 1) % self.expenses_table_layout.count())
+
+    def create_delete_expense_button(self):
+        self.delete_expense_button = QtWidgets.QPushButton("Удалить последнюю запись")
+        self.vertical_layout.addWidget(self.delete_expense_button)
+        self.delete_expense_button.clicked.connect(
+                                                self.delete_expense_button_clicked)
 
     def create_budget_table(self):
         self.vertical_layout.addWidget(QtWidgets.QLabel("Бюджет"))
-        self.vertical_layout.addLayout(CategoryChoice().create())
         self.budget_widget = BudgetWidget()
         data = [
             ['705.43', '1000'],
@@ -101,7 +100,6 @@ class BookkeeperMainWindow(QtWidgets.QMainWindow):
         self.vertical_layout.addWidget(self.add_expense_button)
         self.add_expense_button.clicked.connect(
                                     self.add_expense_button_clicked)
-        print(self.add_expense_button_clicked)
 
     def create(self):
         return self
@@ -110,6 +108,10 @@ class BookkeeperMainWindow(QtWidgets.QMainWindow):
     def exit_app(self):
         self.close()
 
+    def set_category_list(self, cat_list: list[Category]) -> None:
+        cat_to_str = [repr(cat) for cat in cat_list]
+        self.cat_choice = CategoryChoice(cat_to_str)
+
     def set_expense_list(self, exp_list: list[Expense]) -> None:
         exp_to_str = [repr(exp).split(',') for exp in reversed(exp_list)]
         self.refresh_expenses_table(exp_to_str)
@@ -117,15 +119,20 @@ class BookkeeperMainWindow(QtWidgets.QMainWindow):
     def show_budget_widget(self) -> None:
         self.create_budget_table()
 
-    def show_expense_edit_panel(self) -> None:
-        self.create_expense_edit_panel()
-
     @QtCore.Slot()
     def register_expense_adder(self,
                                handler: Callable[[int, str], None]):
         def add_expense_button_clicked():
-            handler(self.amount_edit.get_amount(), self.comment_edit.get_comment())
+            handler(self.amount_edit.get_amount(), 
+                    self.cat_choice.get_category(),
+                    self.comment_edit.get_comment())
         self.add_expense_button_clicked = add_expense_button_clicked
+
+    def register_expense_deleter(self,
+                                handler: Callable[[None], None]):
+        def delete_expense_button_clicked():
+            handler()
+        self.delete_expense_button_clicked = delete_expense_button_clicked
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)

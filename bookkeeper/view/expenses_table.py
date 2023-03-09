@@ -23,7 +23,9 @@ class ExpensesTable(QtWidgets.QTabWidget):
         self.header.setSectionResizeMode(
             2, QtWidgets.QHeaderView.ResizeToContents)
         self.header.setSectionResizeMode(
-            3, QtWidgets.QHeaderView.Stretch)
+            3, QtWidgets.QHeaderView.ResizeToContents)
+        self.header.setSectionResizeMode(
+            4, QtWidgets.QHeaderView.Stretch)
         
         self.expenses_table.setEditTriggers(
             QtWidgets.QAbstractItemView.NoEditTriggers)
@@ -42,70 +44,70 @@ class ExpensesTable(QtWidgets.QTabWidget):
     def create(self) -> QtWidgets.QTableWidget:
        return self.expenses_table
     
-class ExpenseInput(QtWidgets.QWidget):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+# class ExpenseInput(QtWidgets.QWidget):
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(*args, **kwargs)
 
-        # self.vl = QtWidgets.QVBoxLayout()
-        self.hl = QtWidgets.QHBoxLayout()
-        self.setLayout(self.hl)
+#         # self.vl = QtWidgets.QVBoxLayout()
+#         self.hl = QtWidgets.QHBoxLayout()
+#         self.setLayout(self.hl)
 
-        self.hl.addLayout(CategoryChoice().create())
+#         self.hl.addLayout(CategoryChoice().create())
 
-        self.amount = QtWidgets.QLineEdit()
-        self.amount.setPlaceholderText('сумма расхода')
-        self.amount.setValidator(QtGui.QDoubleValidator(0.0, 1.0E8, 2, self))
+#         self.amount = QtWidgets.QLineEdit()
+#         self.amount.setPlaceholderText('сумма расхода')
+#         self.amount.setValidator(QtGui.QDoubleValidator(0.0, 1.0E8, 2, self))
 
-        self.date = QtWidgets.QLineEdit()
-        self.date.setPlaceholderText('дата расхода дд:мм:гггг')
-        self.comment = QtWidgets.QLineEdit()
-        self.comment.setPlaceholderText('комментарий')
+#         self.date = QtWidgets.QLineEdit()
+#         self.date.setPlaceholderText('дата расхода дд:мм:гггг')
+#         self.comment = QtWidgets.QLineEdit()
+#         self.comment.setPlaceholderText('комментарий')
 
-        self.hl.addWidget(self.amount)
-        self.hl.addWidget(self.date)
-        self.hl.addWidget(self.comment)
+#         self.hl.addWidget(self.amount)
+#         self.hl.addWidget(self.date)
+#         self.hl.addWidget(self.comment)
 
-    def is_filled(self):
-        return bool(self.amount.text() and self.date.text() and self.comment.text())
+#     def is_filled(self):
+#         return bool(self.amount.text() and self.date.text() and self.comment.text())
 
-        # self.vl.addLayout(hl)
-        # должна быть возм-ть добавить еще запись (типо значок "+")
+#         # self.vl.addLayout(hl)
+#         # должна быть возм-ть добавить еще запись (типо значок "+")
 
-        # save_button = QtWidgets.QPushButton("Сохранить")
-        # save_button.clicked.connect(self.save_editted)
-        # self.vl.addWidget(save_button)
+#         # save_button = QtWidgets.QPushButton("Сохранить")
+#         # save_button.clicked.connect(self.save_editted)
+#         # self.vl.addWidget(save_button)
 
-    # def save_editted(self):
-    #         print("Saved!")
+#     # def save_editted(self):
+#     #         print("Saved!")
 
-class ExpensesListWidget(QtWidgets.QDialog):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+# class ExpensesListWidget(QtWidgets.QDialog):
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(*args, **kwargs)
 
-        self.setWindowTitle("Редактировать записи о расходах")
-        self.resize(700, 300)
+#         self.setWindowTitle("Редактировать записи о расходах")
+#         self.resize(700, 300)
 
-        self.main_layout = QtWidgets.QVBoxLayout()
-        self.setLayout(self.main_layout)
-        self.lines = []
-        self.add_line()
-        self.add_line()
+#         self.main_layout = QtWidgets.QVBoxLayout()
+#         self.setLayout(self.main_layout)
+#         self.lines = []
+#         self.add_line()
+#         self.add_line()
 
-        print(self.lines)
+#         print(self.lines)
 
-        self.save_button = QtWidgets.QPushButton("Сохранить")
-        self.save_button.clicked.connect(self.save_editted)
-        self.main_layout.addWidget(self.save_button)
+#         self.save_button = QtWidgets.QPushButton("Сохранить")
+#         self.save_button.clicked.connect(self.save_editted)
+#         self.main_layout.addWidget(self.save_button)
 
-        self.exec()
+#         self.exec()
 
-    def add_line(self):
-        ln = ExpenseInput()
-        self.lines.append(ln)
-        self.main_layout.addWidget(ln)
+#     def add_line(self):
+#         ln = ExpenseInput()
+#         self.lines.append(ln)
+#         self.main_layout.addWidget(ln)
 
-    def save_editted(self):
-        print("Saved!")
+#     def save_editted(self):
+#         print("Saved!")
 
 
 if __name__ == "__main__":

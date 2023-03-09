@@ -1,5 +1,5 @@
 import sys
-from PySide6 import QtWidgets
+from PySide6 import QtWidgets, QtGui
 
 def widget_with_label(text, widget):
     hl = QtWidgets.QHBoxLayout()
@@ -11,7 +11,9 @@ class AmountEdit(QtWidgets.QWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.amount = QtWidgets.QLineEdit('0')
+        self.amount = QtWidgets.QLineEdit()
+        self.amount.setPlaceholderText('0')
+        self.amount.setValidator(QtGui.QDoubleValidator(0.0, 1.0E8, 2, self))
 
         self.layout = widget_with_label(
             'Сумма',
@@ -28,7 +30,8 @@ class CommentEdit(QtWidgets.QWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.comment_edit = QtWidgets.QLineEdit('введите комментарий')
+        self.comment_edit = QtWidgets.QLineEdit()
+        self.comment_edit.setPlaceholderText('введите комментарий')
 
         self.layout = widget_with_label(
             'Комментарий',
@@ -58,7 +61,7 @@ class CategoryChoice(QtWidgets.QWidget):
         return self.category_choice
     
     def get_category(self) -> str:
-        return self.combobox.currentText()  #itemData(self.combobox.currentIndex())
+        return self.combobox.currentText()
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)

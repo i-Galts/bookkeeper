@@ -6,9 +6,11 @@ from bookkeeper.models.category import Category
 from bookkeeper.models.expense import Expense
 from bookkeeper.models.budget import Budget
 
-from bookkeeper.view.expenses_table import ExpensesTable, ExpensesListWidget
+from bookkeeper.view.expenses_table import ExpensesTable
 from bookkeeper.view.budget_widget import BudgetWidget
 from bookkeeper.view.expenses_edit_panel import AmountEdit, CommentEdit, CategoryChoice
+
+from bookkeeper.view.category_edit_window import EditCategoryWidget
 
 def handle_error(widget, handler):
     def inner(*args, **kwargs):
@@ -65,8 +67,9 @@ class BookkeeperMainWindow(QtWidgets.QMainWindow):
         self.file_menu.addAction(self.exit_action)
 
     @QtCore.Slot()
-    def edit_expense_button_clicked(self):
-        pass
+    def edit_category_button_clicked(self):
+        EditCategoryWidget(self.cat_list,
+                           self.add_category_button_clicked)
     
     def refresh_expenses_table(self, exp_list: list[str]):
         self.expenses_table = ExpensesTable(exp_list)
@@ -109,8 +112,8 @@ class BookkeeperMainWindow(QtWidgets.QMainWindow):
         self.close()
 
     def set_category_list(self, cat_list: list[Category]) -> None:
-        cat_to_str = [repr(cat) for cat in cat_list]
-        self.cat_choice = CategoryChoice(cat_to_str)
+        self.cat_list = [repr(cat) for cat in cat_list]
+        self.cat_choice = CategoryChoice(self.cat_list)
 
     def set_expense_list(self, exp_list: list[Expense]) -> None:
         exp_to_str = [repr(exp).split(',') for exp in reversed(exp_list)]
@@ -118,6 +121,11 @@ class BookkeeperMainWindow(QtWidgets.QMainWindow):
 
     def show_budget_widget(self) -> None:
         self.create_budget_table()
+
+    @QtCore.Slot()
+    def register_cat_adder(self,
+                           handler: Callable[[str, int], None]):
+        self.add_category_button_clicked = handler
 
     @QtCore.Slot()
     def register_expense_adder(self,
@@ -128,6 +136,7 @@ class BookkeeperMainWindow(QtWidgets.QMainWindow):
                     self.comment_edit.get_comment())
         self.add_expense_button_clicked = add_expense_button_clicked
 
+    @QtCore.Slot()
     def register_expense_deleter(self,
                                 handler: Callable[[None], None]):
         def delete_expense_button_clicked():

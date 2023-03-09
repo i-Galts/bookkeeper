@@ -112,6 +112,9 @@ class Bookkeeper:
                  repo_factory: RepositoryFactory) -> None:
 
         self.view = view
+        # self.view.register_cat_modifier(self.modify_category)
+        self.view.register_cat_adder(self.add_category)
+        # self.view.register_cat_deleter(self.delete_category)
         self.category_repository = repo_factory.get(Category)
         self.cats = self.category_repository.get_all()
         self.view.set_category_list(self.cats)
@@ -145,11 +148,8 @@ class Bookkeeper:
     #     self.cats.append(['2023-01-09 15:09:00', '43.67', 'Бублик'])
     #     self.view.set_category_list(self.cats)
 
-    # def add_category(self):
-    #     # получение данных из формочки
-    #     # name = 
-    #     # parent = 
-    #     pass
+    def add_category(self, name: str, parent: int):
+        print(name, parent)
 
     # def delete_category(self):
     #     # cat = ... определить выбранную категорию

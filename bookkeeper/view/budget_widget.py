@@ -1,72 +1,107 @@
 import sys
 from PySide6 import QtWidgets
 
+from typing import Callable
+
 from bookkeeper.view.expenses_edit_panel import CategoryChoice
 
 class BudgetTable(QtWidgets.QWidget):
-    def __init__(self, bud_list: list[str], 
-                 cat_list: list[str],
+    def __init__(self, cat_list: list[str],
+                 exp_list: list[list[str]],
+                 bud_list: list[str],
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.budget_list = bud_list
-        cat_list.insert(0, 'Общий бюджет')
+        self.bud_list = bud_list
         self.cat_list = cat_list
-
-        self.main_layout = QtWidgets.QVBoxLayout()
+        self.exp_list = exp_list
 
         self.cat_choice = CategoryChoice(cat_list)
-        self.cat_choice.set_first()
-        self.main_layout.addLayout(self.cat_choice.create())
-
-        # потребуется cat_choice.currentText()
-        # а также bud_list
-
-        self.show_budget_button = QtWidgets.QPushButton('Показать бюджет')
-        self.main_layout.addWidget(self.show_budget_button)
-        self.show_budget_button.clicked.connect(
-                                self.show_budget_button_clicked)
 
         self.budget_table = QtWidgets.QTableWidget()
-        self.budget_table.setColumnCount(2)
-        self.budget_table.setRowCount(3)
-        self.budget_table.setHorizontalHeaderLabels(
-                    "Сумма Бюджет".split())
+        self.budget_table.setColumnCount(3)
+        self.budget_table.setRowCount(2)
         self.budget_table.setVerticalHeaderLabels(
+                    "Сумма Бюджет".split())
+        self.budget_table.setHorizontalHeaderLabels(
                     "День Неделя Месяц".split())
         
-        self.vertical_header = self.budget_table.horizontalHeader()
-        self.vertical_header.setSectionResizeMode(
+        self.horizontal_header = self.budget_table.horizontalHeader()
+        self.horizontal_header.setSectionResizeMode(
             0, QtWidgets.QHeaderView.Stretch)
-        self.vertical_header.setSectionResizeMode(
+        self.horizontal_header.setSectionResizeMode(
             1, QtWidgets.QHeaderView.Stretch)
         
-        self.horizontal_header = self.budget_table.verticalHeader()
-        self.horizontal_header.setSectionResizeMode(
+        self.vertical_header = self.budget_table.verticalHeader()
+        self.vertical_header.setSectionResizeMode(
             0, QtWidgets.QHeaderView.Stretch)
-        self.horizontal_header.setSectionResizeMode(
+        self.vertical_header.setSectionResizeMode(
             1, QtWidgets.QHeaderView.Stretch)
-        self.horizontal_header.setSectionResizeMode(
+        self.vertical_header.setSectionResizeMode(
             2, QtWidgets.QHeaderView.Stretch)
         
         self.budget_table.setEditTriggers(
             QtWidgets.QAbstractItemView.NoEditTriggers)
-         
-    def set_data(self, data: list[list[str]]) -> None:
-        for i, row in enumerate(data):
-            for j, x in enumerate(row):
-                self.budget_table.setItem(
-                    i, j,
-                    QtWidgets.QTableWidgetItem(x.capitalize())
-            )
-                
-    def register_show_budget_button(self,
-                                    )
-
-
-    def create(self) -> QtWidgets.QTableWidget:
-        return self.budget_table
         
+        self.fill_columns(self.cat_choice.get_category())
+         
+    def fill_columns(self, cat: str) -> None:
+        if not self.cat_list:
+            return
+        if not self.exp_list:
+            exp_per_day = 0
+        if not self.bud_list:
+            bud_per_day = 0
+        else:
+            sum_amount = 0
+            days_count = 0
+            for exp in self.exp_list:
+                if (exp[3].lower() == cat.lower()):
+                    exp_amount = float(bud.split(',')[2])
+                    sum_amount += exp_amount
+                    days_count += 1
+            try:
+                exp_per_day = sum_amount / days_count
+            except ZeroDivisionError:
+                exp_per_day = 0
+
+            for bud in self.bud_list:
+                if (bud.split(',')[0].lower() == cat.lower()):
+                    period = int(bud.split(',')[1])
+                    bud_amount = float(bud.split(',')[2])
+            try:
+                bud_per_day = bud_amount / period
+            except ZeroDivisionError:
+                bud_per_day = 0
+
+            days = [1, 7, 30]
+            for i in days:
+                self.budget_table.setItem(
+                        0, i,
+                        QtWidgets.QTableWidgetItem(exp_per_day * i))
+                self.budget_table.setItem(
+                        1, i,
+                        QtWidgets.QTableWidgetItem(bud_per_day * i))
+
+    def create_show_budget_button(self):
+        self.show_budget_button = QtWidgets.QPushButton('Показать бюджет')
+        self.show_budget_button.clicked.connect(
+                                self.show_budget_button_clicked)
+        return self.show_budget_button
+
+    def register_show_budget_button(self, 
+                                    handler: Callable[[None], None]):
+        def show_budget_button_clicked():
+            chosen_cat = self.cat_choice.get_category()
+            self.fill_columns(chosen_cat)
+            handler()
+        self.show_budget_button_clicked = show_budget_button_clicked
+
+    def create_table(self):
+        return self.budget_table
+    
+    def create_cat_choice(self) -> QtWidgets.QHBoxLayout:
+        return self.cat_choice.create()
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)

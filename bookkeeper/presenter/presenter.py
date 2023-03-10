@@ -108,8 +108,6 @@ class Bookkeeper:
         self.buds = self.budget_repository.get_all()
         self.view.set_budget_list(self.buds)
 
-
-        self.view.show_budget_widget()
         self.view.create_expense_edit_panel()
 
     def add_expense(self, amount: int, category: str, comment: str) -> None:

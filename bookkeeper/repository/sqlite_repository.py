@@ -73,17 +73,17 @@ class SQLiteRepository(AbstractRepository[T]):
         con.close()
     
 if __name__ == "__main__":
-    sqlrepo_exp = SQLiteRepository('expense_repo.db', Expense)
-    print(sqlrepo_exp.table_name)
-    print(sqlrepo_exp.fields)
+    # sqlrepo_exp = SQLiteRepository('expense_repo.db', Expense)
+    # print(sqlrepo_exp.table_name)
+    # print(sqlrepo_exp.fields)
 
-    exp = Expense(amount=100, category='Хлеб', comment='Какой-то расход')
-    sqlrepo_exp.add(exp)
+    # exp = Expense(amount=100, category='Хлеб', comment='Какой-то расход')
+    # sqlrepo_exp.add(exp)
 
-    other_exp = Expense(amount=8, category='Книги', comment='Пакет на кассе')
-    one_more_exp = Expense(amount=105, category='Продукты', comment='Длинное-предлинное сообщение')
-    sqlrepo_exp.add(other_exp)
-    sqlrepo_exp.add(one_more_exp)
+    # other_exp = Expense(amount=8, category='Книги', comment='Пакет на кассе')
+    # one_more_exp = Expense(amount=105, category='Продукты', comment='Длинное-предлинное сообщение')
+    # sqlrepo_exp.add(other_exp)
+    # sqlrepo_exp.add(one_more_exp)
 
 
     # sqlrepo_cat = SQLiteRepository('category_repo.db', Category)
@@ -100,3 +100,18 @@ if __name__ == "__main__":
 
     # again = Category(name='Книги', parent=2)
     # sqlrepo_cat.add(again)
+
+    sqlrepo_bud = SQLiteRepository('budget_repo.db', Budget)
+    print(sqlrepo_bud.table_name)
+    print(sqlrepo_bud.fields)
+
+    bud = Budget(category='Шоколад', amount=70, period=1)
+    sqlrepo_bud.add(bud)
+
+    other_bud = Budget(category='Молоко', amount=300, period=30)
+    one_more_bud = Budget(category='Бублики', amount=350, period=7)
+    sqlrepo_bud.add(other_bud)
+    sqlrepo_bud.add(one_more_bud)
+
+    again = Budget(category='Продукты', amount=6000, period=30)
+    sqlrepo_bud.add(again)

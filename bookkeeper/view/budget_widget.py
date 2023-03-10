@@ -1,11 +1,33 @@
 import sys
 from PySide6 import QtWidgets
 
-class BudgetWidget(QtWidgets.QWidget):
-    def __init__(self, *args, **kwargs):
+from bookkeeper.view.expenses_edit_panel import CategoryChoice
+
+class BudgetTable(QtWidgets.QWidget):
+    def __init__(self, bud_list: list[str], 
+                 cat_list: list[str],
+                 *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.budget_table = QtWidgets.QTableWidget(3, 2)
+        self.budget_list = bud_list
+        cat_list.insert(0, 'Общий бюджет')
+        self.cat_list = cat_list
+
+        self.main_layout = QtWidgets.QVBoxLayout()
+
+        self.cat_choice = CategoryChoice(cat_list)
+        self.cat_choice.set_first()
+        self.main_layout.addLayout(self.cat_choice.create())
+
+        # потребуется cat_choice.currentText()
+        # а также bud_list
+
+        self.show_budget_button = QtWidgets.QPushButton('Показать бюджет')
+        self.main_layout.addWidget(self.show_budget_button)
+        self.show_budget_button.clicked.connect(
+                                self.show_budget_button_clicked)
+
+        self.budget_table = QtWidgets.QTableWidget()
         self.budget_table.setColumnCount(2)
         self.budget_table.setRowCount(3)
         self.budget_table.setHorizontalHeaderLabels(
@@ -29,7 +51,7 @@ class BudgetWidget(QtWidgets.QWidget):
         
         self.budget_table.setEditTriggers(
             QtWidgets.QAbstractItemView.NoEditTriggers)
-        
+         
     def set_data(self, data: list[list[str]]) -> None:
         for i, row in enumerate(data):
             for j, x in enumerate(row):
@@ -37,6 +59,10 @@ class BudgetWidget(QtWidgets.QWidget):
                     i, j,
                     QtWidgets.QTableWidgetItem(x.capitalize())
             )
+                
+    def register_show_budget_button(self,
+                                    )
+
 
     def create(self) -> QtWidgets.QTableWidget:
         return self.budget_table

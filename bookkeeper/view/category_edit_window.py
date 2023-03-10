@@ -1,6 +1,15 @@
 from PySide6 import QtWidgets, QtCore
 from typing import Callable
-from functools import partial
+
+def catch_error(widget, handler):
+    def inner(*args, **kwargs):
+        try:
+            handler(*args, **kwargs)
+        except IndexError as ex:
+            print('olololo')
+            QtWidgets.QMessageBox.critical(widget, 'Ошибка', str(ex))
+            return
+    return inner
 
 class AddCategoryInput(QtWidgets.QWidget):
     def __init__(self, cat_list: list[str], 
@@ -30,10 +39,35 @@ class AddCategoryInput(QtWidgets.QWidget):
     
     def create(self) -> QtWidgets.QHBoxLayout:
         return self.hl
+    
+class DeleteCategoryInput(QtWidgets.QWidget):
+    def __init__(self, cat_list: list[str], 
+                 *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.hl = QtWidgets.QHBoxLayout()
+        self.cat_name = QtWidgets.QLineEdit()
+
+        self.cat_names = QtWidgets.QComboBox()
+        self.cat_names.addItem('Выберите категорию')
+        for cat in cat_list:
+            self.cat_names.addItem(cat.split(',')[0].capitalize())
+        self.cat_names.setCurrentIndex(0)
+        self.hl.addWidget(self.cat_names)
+
+    def get_cat_name(self) -> str:
+        cur_text = self.cat_names.currentText()
+        if (cur_text == 'Выберите категорию'):
+            return ''
+        return cur_text
+    
+    def create(self) -> QtWidgets.QHBoxLayout:
+        return self.hl
 
 class EditCategoryWidget(QtWidgets.QDialog):
     def __init__(self, cat_list: list[str], 
                  signal_add_cat: Callable,
+                 signal_delete_cat: Callable,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -52,6 +86,16 @@ class EditCategoryWidget(QtWidgets.QDialog):
         self.register_category_adder(signal_add_cat)
         self.add_button.clicked.connect(
                                 self.add_category_button_clicked)
+        
+        self.main_layout.addWidget(QtWidgets.QLabel("Удаление категории"))
+        self.del_cat_wdt = DeleteCategoryInput(cat_list)
+        self.main_layout.addLayout(self.del_cat_wdt.create())
+        
+        self.delete_button = QtWidgets.QPushButton('Удалить')
+        self.main_layout.addWidget(self.delete_button)
+        self.register_category_deleter(signal_delete_cat)
+        self.delete_button.clicked.connect(
+                                self.delete_category_button_clicked)
 
         self.exec()
 
@@ -59,9 +103,22 @@ class EditCategoryWidget(QtWidgets.QDialog):
     def register_category_adder(self,
                                handler: Callable[[int, str], None]):
         def add_category_button_clicked():
-            handler(self.add_cat_wdt.get_cat_name(),
-                    self.add_cat_wdt.get_parent())
+            try:
+                handler(self.add_cat_wdt.get_cat_name(),
+                        self.add_cat_wdt.get_parent())
+            except IndexError as ex:
+                QtWidgets.QMessageBox.critical(self, 'Ошибка', str(ex))
         self.add_category_button_clicked = add_category_button_clicked
+
+    @QtCore.Slot()
+    def register_category_deleter(self,
+                                  handler: Callable[[None], None]):
+        def delete_category_button_clicked():
+            try:
+                handler()
+            except IndexError as ex:
+                QtWidgets.QMessageBox.critical(self, 'Ошибка', str(ex))
+        self.delete_category_button_clicked = delete_category_button_clicked
 
 
 

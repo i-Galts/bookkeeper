@@ -7,12 +7,12 @@ from bookkeeper.models.expense import Expense
 from bookkeeper.models.budget import Budget
 
 from bookkeeper.view.expenses_table import ExpensesTable
-from bookkeeper.view.budget_widget import BudgetWidget
+from bookkeeper.view.budget_widget import BudgetTable
 from bookkeeper.view.expenses_edit_panel import AmountEdit, CommentEdit, CategoryChoice
 
 from bookkeeper.view.category_edit_window import EditCategoryWidget
 
-def handle_error(widget, handler):
+def catch_error(widget, handler):
     def inner(*args, **kwargs):
         try:
             handler(*args, **kwargs)
@@ -31,16 +31,19 @@ class BookkeeperMainWindow(QtWidgets.QMainWindow):
         self.resize(800, 900)
         self.central_widget = QtWidgets.QTabWidget()
         self.setCentralWidget(self.central_widget)
-        # to do: add tooltips for different widgets
         self.vertical_layout = QtWidgets.QVBoxLayout()
 
         self.create_menu()
 
         self.expenses_table_layout = QtWidgets.QStackedLayout()
-
         self.vertical_layout.addWidget(QtWidgets.QLabel("Последние расходы"))
         self.expenses_table = ExpensesTable([])
         self.expenses_table_layout.addWidget(self.expenses_table.create())
+
+        self.budget_table_layout = QtWidgets.QStackedLayout()
+        self.vertical_layout.addWidget(QtWidgets.QLabel("Бюджет"))
+        self.budget_table = BudgetTable([])
+        self.budget_table_layout.addWidget(self.budget_table.create())
 
         self.amount_edit = AmountEdit()
         self.comment_edit = CommentEdit()
@@ -69,7 +72,8 @@ class BookkeeperMainWindow(QtWidgets.QMainWindow):
     @QtCore.Slot()
     def edit_category_button_clicked(self):
         EditCategoryWidget(self.cat_list,
-                           self.add_category_button_clicked)
+                           self.add_category_button_clicked,
+                           self.delete_category_button_clicked)
     
     def refresh_expenses_table(self, exp_list: list[str]):
         self.expenses_table = ExpensesTable(exp_list)
@@ -82,18 +86,30 @@ class BookkeeperMainWindow(QtWidgets.QMainWindow):
         self.vertical_layout.addWidget(self.delete_expense_button)
         self.delete_expense_button.clicked.connect(
                                                 self.delete_expense_button_clicked)
+        
+    def create_show_budget_button(self):
+        self.show_budget_button = QtWidgets.QPushButton('Показать бюджет')
+        self.vertical_layout.addWidget(self.show_budget_button)
+        self.show_budget_button.clicked.connect(
+                                        self.show_budget_button_clicked)
 
-    def create_budget_table(self):
-        self.vertical_layout.addWidget(QtWidgets.QLabel("Бюджет"))
-        self.budget_widget = BudgetWidget()
-        data = [
-            ['705.43', '1000'],
-            ['6719.43', '7000'],
-            ['10592.96', '30000']
-        ]
-        self.budget_widget.set_data(data)
-        self.budget_widget.resize(300, 300)
-        self.vertical_layout.addWidget(self.budget_widget.create())
+    # def create_budget_table(self):
+    #     self.vertical_layout.addWidget(QtWidgets.QLabel("Бюджет"))
+    #     self.budget_widget = BudgetWidget()
+    #     data = [
+    #         ['705.43', '1000'],
+    #         ['6719.43', '7000'],
+    #         ['10592.96', '30000']
+    #     ]
+    #     self.budget_widget.set_data(data)
+    #     self.budget_widget.resize(300, 300)
+    #     self.vertical_layout.addWidget(self.budget_widget.create())
+
+    def refresh_budget_table(self, bud_list: list[str]):
+        self.budget_table = BudgetTable(bud_list, self.cat_list)
+        self.budget_table_layout.addWidget(self.expenses_table.create())
+        p = (self.budget_table_layout.currentIndex() + 1) % self.budget_table_layout.count()
+        self.budget_table_layout.setCurrentIndex(p)
 
     def create_expense_edit_panel(self):
         self.vertical_layout.addLayout(self.amount_edit.create())
@@ -119,13 +135,19 @@ class BookkeeperMainWindow(QtWidgets.QMainWindow):
         exp_to_str = [repr(exp).split(',') for exp in reversed(exp_list)]
         self.refresh_expenses_table(exp_to_str)
 
-    def show_budget_widget(self) -> None:
-        self.create_budget_table()
+    def set_budget_list(self, bud_list: list[Budget]) -> None:
+        self.bud_list = [repr(bud) for bud in bud_list]
+        #self.refresh_budget_table(self.buds_list)
 
     @QtCore.Slot()
     def register_cat_adder(self,
                            handler: Callable[[str, int], None]):
         self.add_category_button_clicked = handler
+
+    @QtCore.Slot()
+    def register_cat_deleter(self,
+                             handler: Callable[[None], None]):
+        self.delete_category_button_clicked = handler
 
     @QtCore.Slot()
     def register_expense_adder(self,
@@ -140,7 +162,10 @@ class BookkeeperMainWindow(QtWidgets.QMainWindow):
     def register_expense_deleter(self,
                                 handler: Callable[[None], None]):
         def delete_expense_button_clicked():
-            handler()
+            try:
+                handler()
+            except IndexError as ex:
+                QtWidgets.QMessageBox.critical(self, 'Ошибка', str(ex))
         self.delete_expense_button_clicked = delete_expense_button_clicked
 
 if __name__ == "__main__":

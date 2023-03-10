@@ -62,6 +62,9 @@ class CategoryChoice(QtWidgets.QWidget):
     
     def get_category(self) -> str:
         return self.combobox.currentText()
+    
+    def set_first(self) -> None:
+        self.combobox.setCurrentIndex(0)
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)

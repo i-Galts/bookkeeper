@@ -40,66 +40,43 @@ class RepositoryFactory:
         """
         return self.repo_dict[model_cls]
 
-# У MainView должны быть реализованы эти методы!
 class AbstractView(Protocol):
     def set_category_list(lst: list[Category]) -> None:
         pass
 
-    def show_budget_widget() -> None:
-        pass
-
-    def show_amount_edit_widget() -> None:
-        pass
-
-    def show_category_choice_widget() -> None:
-        pass
-
-    def register_cat_modifier(
-             self,
-             handler: Callable[[Category], None]) -> None:
-        pass
-
-    def register_cat_adder(
-            self,
-            handler: Callable[[Category], None]) -> None:
-        pass
-
-# class BookkeeperMainView:
-#     def __init__(self, 
-#                  window: BookkeeperMainWindow):
-#         self.window = window
-
-#     # def set_category_list(self, cat_list: list[Category]) -> None:
-#     #     #cat_to_str = [str(cat) for cat in lst.split()]
-
-#     def set_expense_list(self, exp_list: list[Expense]) -> None:
-#         #exp_to_str = [str(exp) for cat in exp_list.split()]
-#         self.window.create_expenses_table(exp_list)
-
-#     def show_budget_widget(self) -> None:
-#         self.window.create_budget_table()
-
-#     def show_expense_edit_panel(self) -> None:
-#         self.window.create_expense_edit_panel()
-
-    # def show_category_choice_widget(self) -> None:
-    #     self.window.create_category_choice_widget()
-
-    # def register_expense_adder(
-    #         self,
-    #         handler: Callable[[Category], None]) -> None:
-    #     pass
-
-
     # def register_cat_modifier(
     #          self,
     #          handler: Callable[[Category], None]) -> None:
-    #     self.cat_modifier = handle_error(self, handler)
+    #     pass
 
-    # def register_cat_adder(
-    #         self,
-    #         handler: Callable[[Category], None]) -> None:
-    #     self.cat_adder = handle_error(self, handler)
+    def register_cat_adder(
+            self,
+            handler: Callable[[str, int], None]) -> None:
+        pass
+
+    def register_cat_deleter(
+            self,
+            handler: Callable[[None], None]) -> None:
+        pass
+
+    def set_expense_list(self, exp_list: list[Expense]) -> None:
+        pass
+
+    def register_expense_adder(
+            self,
+            handler: Callable[[int, str], None]) -> None:
+        pass
+
+    def register_expense_deleter(
+            self,
+            handler: Callable[[None], None]) -> None:
+        pass
+
+    def create_delete_expense_button(self) -> None:
+        pass
+
+    def set_budget_list(self, exp_list: list[Budget]) -> None:
+        pass
 
 class Bookkeeper:
     """
@@ -114,9 +91,10 @@ class Bookkeeper:
         self.view = view
         # self.view.register_cat_modifier(self.modify_category)
         self.view.register_cat_adder(self.add_category)
-        # self.view.register_cat_deleter(self.delete_category)
+        self.view.register_cat_deleter(self.delete_category)
         self.category_repository = repo_factory.get(Category)
         self.cats = self.category_repository.get_all()
+        self.cat_names = [cat.name.capitalize() for cat in self.cats]
         self.view.set_category_list(self.cats)
 
         self.view.register_expense_adder(self.add_expense)
@@ -125,6 +103,11 @@ class Bookkeeper:
         self.exps = self.expense_repository.get_all()
         self.view.set_expense_list(self.exps)
         self.view.create_delete_expense_button()
+
+        self.budget_repository = repo_factory.get(Budget)
+        self.buds = self.budget_repository.get_all()
+        self.view.set_budget_list(self.buds)
+
 
         self.view.show_budget_widget()
         self.view.create_expense_edit_panel()
@@ -137,6 +120,8 @@ class Bookkeeper:
         self.view.set_expense_list(self.exps)
 
     def delete_expense(self):
+       if (len(self.exps) == 0):
+            raise IndexError('Нет записей о расходах!')
        last_pk = len(self.exps)
        self.exps.pop()
        self.view.set_expense_list(self.exps)
@@ -149,10 +134,20 @@ class Bookkeeper:
     #     self.view.set_category_list(self.cats)
 
     def add_category(self, name: str, parent: int):
+        if (name.capitalize() in self.cat_names):
+            raise IndexError('Категория с таким именем уже добавлена!')
         cat = Category(name=name, parent=parent)
         self.category_repository.add(cat)
         self.cats.append(cat)
         self.view.set_category_list(self.cats)
+
+    def delete_category(self):
+        if (len(self.cats) == 0):
+            raise IndexError('Нет категорий!')
+        last_pk = len(self.cats)
+        self.cats.pop()
+        self.view.set_category_list(self.cats)
+        self.category_repository.delete(last_pk)
 
     # def delete_category(self):
     #     # cat = ... определить выбранную категорию

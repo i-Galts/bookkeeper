@@ -149,7 +149,10 @@ class Bookkeeper:
     #     self.view.set_category_list(self.cats)
 
     def add_category(self, name: str, parent: int):
-        print(name, parent)
+        cat = Category(name=name, parent=parent)
+        self.category_repository.add(cat)
+        self.cats.append(cat)
+        self.view.set_category_list(self.cats)
 
     # def delete_category(self):
     #     # cat = ... определить выбранную категорию

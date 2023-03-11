@@ -1,11 +1,7 @@
 """
 Модель категории расходов
 """
-from collections import defaultdict
 from dataclasses import dataclass
-from typing import Iterator
-
-from bookkeeper.repository.abstract_repository import AbstractRepository
 
 @dataclass
 class Category:

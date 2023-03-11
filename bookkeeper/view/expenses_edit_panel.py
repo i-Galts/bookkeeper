@@ -1,13 +1,23 @@
-import sys
+"""
+Виджет добавления новой записи о расходах.
+"""
 from PySide6 import QtWidgets, QtGui
 
-def widget_with_label(text, widget) -> QtWidgets.QHBoxLayout:
-    hl = QtWidgets.QHBoxLayout()
-    hl.addWidget(QtWidgets.QLabel(text))
-    hl.addWidget(widget)
-    return hl
+def widget_with_label(text, widget) \
+                -> QtWidgets.QHBoxLayout:
+    """
+    Именованный виджет.
+    Принимает текст и виджет.
+    """
+    horizontal_layout = QtWidgets.QHBoxLayout()
+    horizontal_layout.addWidget(QtWidgets.QLabel(text))
+    horizontal_layout.addWidget(widget)
+    return horizontal_layout
 
 class AmountEdit(QtWidgets.QWidget):
+    """
+    Класс строки ввода суммы расхода.
+    """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -22,11 +32,14 @@ class AmountEdit(QtWidgets.QWidget):
 
     def create_edit(self):
         return self.layout
-    
+
     def get_amount(self) -> str:
         return self.amount.text() or ''
-    
+
 class CommentEdit(QtWidgets.QWidget):
+    """
+    Класс строки ввода комментария очередного расхода.
+    """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -40,11 +53,14 @@ class CommentEdit(QtWidgets.QWidget):
 
     def create_edit(self):
         return self.layout
-    
+
     def get_comment(self) -> str:
         return self.comment_edit.text() or ''
-    
+
 class CategoryChoice(QtWidgets.QWidget):
+    """
+    Класс выпадающего списка доступных категорий.
+    """
     def __init__(self, cat_list: list[str], *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -59,10 +75,10 @@ class CategoryChoice(QtWidgets.QWidget):
 
     def create_choice(self) -> QtWidgets.QHBoxLayout:
         return self.category_choice
-    
+
     def get_category(self) -> str:
         return self.combobox.currentText()
-    
+
 # if __name__ == "__main__":
 #     app = QtWidgets.QApplication(sys.argv)
 #     window = QtWidgets.QMainWindow()

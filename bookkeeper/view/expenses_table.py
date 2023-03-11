@@ -1,22 +1,24 @@
-import sys
-from PySide6 import QtWidgets, QtGui
-
-from bookkeeper.view.expenses_edit_panel import CategoryChoice
+"""
+Таблица с записями о расходах.
+"""
+from PySide6 import QtWidgets
 
 class ExpensesTable(QtWidgets.QTabWidget):
+    """
+    Класс таблицы. Описан метод заполнения в
+    соответствии с переданным списком расходов cat_list.
+    """
     def __init__(self, exp_list: list[list[str]], *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.expense_list = exp_list
-
-        QtWidgets.QHeaderView.setSectionResizeMode
 
         self.expenses_table = QtWidgets.QTableWidget()
         self.expenses_table.setColumnCount(5)
         self.expenses_table.setRowCount(100)
         self.expenses_table.setHorizontalHeaderLabels(
             "Дата добавления, Фактическая дата, Сумма, Категория, Комментарий".split(','))
-        
+
         self.header = self.expenses_table.horizontalHeader()
         self.header.setSectionResizeMode(
             0, QtWidgets.QHeaderView.Interactive)
@@ -28,7 +30,7 @@ class ExpensesTable(QtWidgets.QTabWidget):
             3, QtWidgets.QHeaderView.Interactive)
         self.header.setSectionResizeMode(
             4, QtWidgets.QHeaderView.Stretch)
-        
+
         self.expenses_table.setEditTriggers(
             QtWidgets.QAbstractItemView.NoEditTriggers)
         self.expenses_table.verticalHeader().hide()
@@ -36,6 +38,10 @@ class ExpensesTable(QtWidgets.QTabWidget):
         self.set_expense_list()
 
     def set_expense_list(self) -> None:
+        """
+        Заполнение таблицы в
+        соответствии с переданным списком расходов cat_list.
+        """
         for i, row in enumerate(self.expense_list):
             for j, x in enumerate(row):
                 self.expenses_table.setItem(
@@ -44,8 +50,8 @@ class ExpensesTable(QtWidgets.QTabWidget):
             )
 
     def create_table(self) -> QtWidgets.QTableWidget:
-       return self.expenses_table
-    
+        return self.expenses_table
+
 # class ExpenseInput(QtWidgets.QWidget):
 #     def __init__(self, *args, **kwargs):
 #         super().__init__(*args, **kwargs)

@@ -1,11 +1,17 @@
-import sys
-from PySide6 import QtWidgets
-
+"""
+Виджет таблицы с бюджетом.
+"""
 from typing import Callable
+
+from PySide6 import QtWidgets
 
 from bookkeeper.view.expenses_edit_panel import CategoryChoice
 
 class BudgetTable(QtWidgets.QWidget):
+    """
+    Класс таблицы бюджета. Принимает данные о всех трех
+    моделях для отображения.
+    """
     def __init__(self, cat_list: list[str],
                  exp_list: list[list[str]],
                  bud_list: list[str],
@@ -25,13 +31,13 @@ class BudgetTable(QtWidgets.QWidget):
                     "Сумма Бюджет".split())
         self.budget_table.setHorizontalHeaderLabels(
                     "День Неделя Месяц".split())
-        
+
         self.horizontal_header = self.budget_table.horizontalHeader()
         self.horizontal_header.setSectionResizeMode(
             0, QtWidgets.QHeaderView.Stretch)
         self.horizontal_header.setSectionResizeMode(
             1, QtWidgets.QHeaderView.Stretch)
-        
+
         self.vertical_header = self.budget_table.verticalHeader()
         self.vertical_header.setSectionResizeMode(
             0, QtWidgets.QHeaderView.Stretch)
@@ -39,13 +45,17 @@ class BudgetTable(QtWidgets.QWidget):
             1, QtWidgets.QHeaderView.Stretch)
         self.vertical_header.setSectionResizeMode(
             2, QtWidgets.QHeaderView.Stretch)
-        
+
         self.budget_table.setEditTriggers(
             QtWidgets.QAbstractItemView.NoEditTriggers)
-        
+
         self.fill_columns(self.cat_choice.get_category())
-         
+
     def fill_columns(self, cat: str) -> None:
+        """
+        Заполнение таблицы для выбранной
+        пользователем категории cat.
+        """
         if not self.cat_list:
             return
         if not self.exp_list:
@@ -84,13 +94,20 @@ class BudgetTable(QtWidgets.QWidget):
                         QtWidgets.QTableWidgetItem(bud_per_day * i))
 
     def create_show_budget_button(self):
+        """
+        Привязка кнопки для отображения бюджета.
+        """
         self.show_budget_button = QtWidgets.QPushButton('Показать бюджет')
         self.show_budget_button.clicked.connect(
                                 self.show_budget_button_clicked)
         return self.show_budget_button
 
-    def register_show_budget_button(self, 
+    def register_show_budget_button(self,
                                     handler: Callable[[None], None]):
+        """
+        Регистрация действий при нажатии на
+        кнопку для отображения бюджета.
+        """
         def show_budget_button_clicked():
             chosen_cat = self.cat_choice.get_category()
             self.fill_columns(chosen_cat)
@@ -99,10 +116,10 @@ class BudgetTable(QtWidgets.QWidget):
 
     def create_table(self):
         return self.budget_table
-    
+
     def create_cat_choice(self) -> QtWidgets.QHBoxLayout:
         return self.cat_choice.create_choice()
-    
+
     def create(self):
         return self.main_layout
 

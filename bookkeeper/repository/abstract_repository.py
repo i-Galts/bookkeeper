@@ -57,3 +57,4 @@ class AbstractRepository(ABC, Generic[T]):
     @abstractmethod
     def delete(self, pk: int) -> None:
         """ Удалить запись """
+        

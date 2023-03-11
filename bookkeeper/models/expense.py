@@ -27,13 +27,3 @@ class Expense:
     def __repr__(self):
         return f'{str(self.added_date.date())}, {str(self.expense_date.date()).strip()},' \
                 f' {self.amount}, {self.category}, {self.comment}'
-
-    # def __repr__(self):
-    #     return f'{"{:%B %d %Y}".format(self.added_date.date()).strip()}, \
-    #                       {"{:%B %d %Y}".format(self.expense_date.date()).strip()}, \
-    #                         {self.amount}, {self.category}, {self.comment}'
-
-if __name__ == "__main__":
-    exp = Expense(amount=100, category='Milk', comment='lalala')
-    print(exp)
-    

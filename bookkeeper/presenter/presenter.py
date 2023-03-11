@@ -19,7 +19,7 @@ class RepositoryFactory:
     При создании фабрики указывается тип repo_type:
     либо MemoryRepository, либо SQLiteRepository.
     """
-    def __init__(self, repo_type: type):
+    def __init__(self, repo_type):
         if (repo_type == SQLiteRepository):
             self.repo_dict = {
                 Category: SQLiteRepository('./repos/category_repo.db', Category),
@@ -44,11 +44,6 @@ class AbstractView(Protocol):
     def set_category_list(lst: list[Category]) -> None:
         pass
 
-    # def register_cat_modifier(
-    #          self,
-    #          handler: Callable[[Category], None]) -> None:
-    #     pass
-
     def register_cat_adder(
             self,
             handler: Callable[[str, int], None]) -> None:
@@ -56,7 +51,7 @@ class AbstractView(Protocol):
 
     def register_cat_deleter(
             self,
-            handler: Callable[[None], None]) -> None:
+            handler: Callable[[None], None]):
         pass
 
     def set_expense_list(self, exp_list: list[Expense]) -> None:
@@ -104,9 +99,9 @@ class Bookkeeper:
         self.view.set_expense_list(self.exps)
         self.view.create_delete_expense_button()
 
-        self.budget_repository = repo_factory.get(Budget)
-        self.buds = self.budget_repository.get_all()
-        self.view.set_budget_list(self.buds)
+        # self.budget_repository = repo_factory.get(Budget)
+        # self.buds = self.budget_repository.get_all()
+        # self.view.set_budget_list(self.buds)
 
         self.view.create_expense_edit_panel()
 
@@ -125,12 +120,6 @@ class Bookkeeper:
        self.view.set_expense_list(self.exps)
        self.expense_repository.delete(last_pk)
 
-    # def modify_cat(self, cat: Category) -> None:
-    #     # self.category_repository.update(cat)
-    #     # self.cats = self.category_repository.get_all()
-    #     self.cats.append(['2023-01-09 15:09:00', '43.67', 'Бублик'])
-    #     self.view.set_category_list(self.cats)
-
     def add_category(self, name: str, parent: int):
         if (name.capitalize() in self.cat_names):
             raise IndexError('Категория с таким именем уже добавлена!')
@@ -139,7 +128,7 @@ class Bookkeeper:
         self.cats.append(cat)
         self.view.set_category_list(self.cats)
 
-    def delete_category(self):
+    def delete_category(self) -> None:
         if (len(self.cats) == 0):
             raise IndexError('Нет категорий!')
         last_pk = len(self.cats)
@@ -147,41 +136,12 @@ class Bookkeeper:
         self.view.set_category_list(self.cats)
         self.category_repository.delete(last_pk)
 
-    # def delete_category(self):
-    #     # cat = ... определить выбранную категорию
-    #     # тут может быть отдельное окно, галочки, контекстное меню
-    #     del_subcats, del_expenses = self.ask_del_cat()
-    #     self.cat_deleter(cat, del_subcats,del_expenses)
-
-    # def add_expense_updater(self, callback):
-    #     self.table.itemChanged.connect(self.on_table_change)
-    #     self.expense_updater = callback
-
-    # def on_table_change(self, item):
-    #     self.expense_updater(expense_from_item(item))
 
 if __name__ == "__main__":
-
-    # 1. Надо создать объект класса MainView - он изначально пустой
-    # 2. Надо построить на нем Bookkeeper
-    # 3. Надо получить список категорий у репо из bookkeeper
-    # 4. Надо передать этот список MainWindow из bookkeeper/MainView
-    # 5. так делать со всем остальным, пока MainWindow не заполнится
-    # 6. По итогу отрисовать окно
 
     app = QtWidgets.QApplication(sys.argv)
     window = BookkeeperMainWindow()
     repo_factory = RepositoryFactory(SQLiteRepository)
-    # view = BookkeeperMainView(window)
     bookkeeper = Bookkeeper(window, repo_factory)
-    #bookkeeper.provide_with_category_list()
     window.show()
     sys.exit(app.exec())
-
-
-    # app = QtWidgets.QApplication(sys.argv)
-    # window = MainWindow()
-    # bookkeeper = Bookkeeper(window)
-    # bookkeeper.provide_with_category_list()
-    # window.show()
-    # sys.exit(app.exec())

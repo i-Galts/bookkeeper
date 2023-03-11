@@ -4,10 +4,12 @@ from PySide6 import QtWidgets, QtGui
 from bookkeeper.view.expenses_edit_panel import CategoryChoice
 
 class ExpensesTable(QtWidgets.QTabWidget):
-    def __init__(self, exp_list: list[str], *args, **kwargs):
+    def __init__(self, exp_list: list[list[str]], *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.expense_list = exp_list
+
+        QtWidgets.QHeaderView.setSectionResizeMode
 
         self.expenses_table = QtWidgets.QTableWidget()
         self.expenses_table.setColumnCount(5)
@@ -17,13 +19,13 @@ class ExpensesTable(QtWidgets.QTabWidget):
         
         self.header = self.expenses_table.horizontalHeader()
         self.header.setSectionResizeMode(
-            0, QtWidgets.QHeaderView.ResizeToContents)
+            0, QtWidgets.QHeaderView.Interactive)
         self.header.setSectionResizeMode(
-            1, QtWidgets.QHeaderView.ResizeToContents)
+            1, QtWidgets.QHeaderView.Interactive)
         self.header.setSectionResizeMode(
-            2, QtWidgets.QHeaderView.ResizeToContents)
+            2, QtWidgets.QHeaderView.Interactive)
         self.header.setSectionResizeMode(
-            3, QtWidgets.QHeaderView.ResizeToContents)
+            3, QtWidgets.QHeaderView.Interactive)
         self.header.setSectionResizeMode(
             4, QtWidgets.QHeaderView.Stretch)
         
@@ -41,7 +43,7 @@ class ExpensesTable(QtWidgets.QTabWidget):
                     QtWidgets.QTableWidgetItem(x.capitalize())
             )
 
-    def create(self) -> QtWidgets.QTableWidget:
+    def create_table(self) -> QtWidgets.QTableWidget:
        return self.expenses_table
     
 # class ExpenseInput(QtWidgets.QWidget):
@@ -110,22 +112,22 @@ class ExpensesTable(QtWidgets.QTabWidget):
 #         print("Saved!")
 
 
-if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
-    window = QtWidgets.QMainWindow()
-    window.resize(300, 300)
-    central_widget = QtWidgets.QTabWidget()
-    window.setCentralWidget(central_widget)
-    expenses_table = ExpensesTable()
-    data = [
-        ['2023-01-09 15:09:00', '7.49', 'Хозтовары', 'Пакет на кассе'],
-        ['2023-01-09 15:09:00', '104.99', 'Кефир']
-    ]
-    expenses_table.set_data(data)
-    vertical_layout = QtWidgets.QVBoxLayout()
-    vertical_layout.addWidget(expenses_table.create())
+# if __name__ == "__main__":
+#     app = QtWidgets.QApplication(sys.argv)
+#     window = QtWidgets.QMainWindow()
+#     window.resize(300, 300)
+#     central_widget = QtWidgets.QTabWidget()
+#     window.setCentralWidget(central_widget)
+#     expenses_table = ExpensesTable()
+#     data = [
+#         ['2023-01-09 15:09:00', '7.49', 'Хозтовары', 'Пакет на кассе'],
+#         ['2023-01-09 15:09:00', '104.99', 'Кефир']
+#     ]
+#     expenses_table.set_data(data)
+#     vertical_layout = QtWidgets.QVBoxLayout()
+#     vertical_layout.addWidget(expenses_table.create())
 
-    central_widget.setLayout(vertical_layout)
-    window.show()
+#     central_widget.setLayout(vertical_layout)
+#     window.show()
 
-    sys.exit(app.exec())
+#     sys.exit(app.exec())

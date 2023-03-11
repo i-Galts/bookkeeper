@@ -53,11 +53,11 @@ class BudgetTable(QtWidgets.QWidget):
         if not self.bud_list:
             bud_per_day = 0
         else:
-            sum_amount = 0
+            sum_amount = 0.0
             days_count = 0
             for exp in self.exp_list:
                 if (exp[3].lower() == cat.lower()):
-                    exp_amount = float(bud.split(',')[2])
+                    exp_amount = float(exp[2])
                     sum_amount += exp_amount
                     days_count += 1
             try:
@@ -101,25 +101,28 @@ class BudgetTable(QtWidgets.QWidget):
         return self.budget_table
     
     def create_cat_choice(self) -> QtWidgets.QHBoxLayout:
-        return self.cat_choice.create()
+        return self.cat_choice.create_choice()
+    
+    def create(self):
+        return self.main_layout
 
-if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
-    window = QtWidgets.QMainWindow()
-    window.resize(300, 300)
-    central_widget = QtWidgets.QTabWidget()
-    window.setCentralWidget(central_widget)
-    budget_table = BudgetWidget()
-    data = [
-        ['705.43', '1000'],
-        ['6719.43', '7000'],
-        ['10592.96', '30000']
-    ]
-    budget_table.set_data(data)
-    vertical_layout = QtWidgets.QVBoxLayout()
-    vertical_layout.addWidget(budget_table.create())
+# if __name__ == "__main__":
+#     app = QtWidgets.QApplication(sys.argv)
+#     window = QtWidgets.QMainWindow()
+#     window.resize(300, 300)
+#     central_widget = QtWidgets.QTabWidget()
+#     window.setCentralWidget(central_widget)
+#     budget_table = BudgetWidget()
+#     data = [
+#         ['705.43', '1000'],
+#         ['6719.43', '7000'],
+#         ['10592.96', '30000']
+#     ]
+#     budget_table.set_data(data)
+#     vertical_layout = QtWidgets.QVBoxLayout()
+#     vertical_layout.addWidget(budget_table.create())
 
-    central_widget.setLayout(vertical_layout)
-    window.show()
+#     central_widget.setLayout(vertical_layout)
+#     window.show()
 
-    sys.exit(app.exec())
+#     sys.exit(app.exec())

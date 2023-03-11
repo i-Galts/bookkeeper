@@ -37,7 +37,7 @@ class AddCategoryInput(QtWidgets.QWidget):
             return ''
         return cur_text
     
-    def create(self) -> QtWidgets.QHBoxLayout:
+    def create_input(self) -> QtWidgets.QHBoxLayout:
         return self.hl
     
 class DeleteCategoryInput(QtWidgets.QWidget):
@@ -61,7 +61,7 @@ class DeleteCategoryInput(QtWidgets.QWidget):
             return ''
         return cur_text
     
-    def create(self) -> QtWidgets.QHBoxLayout:
+    def create_input(self) -> QtWidgets.QHBoxLayout:
         return self.hl
 
 class EditCategoryWidget(QtWidgets.QDialog):
@@ -79,7 +79,7 @@ class EditCategoryWidget(QtWidgets.QDialog):
 
         self.main_layout.addWidget(QtWidgets.QLabel("Добавление категории"))
         self.add_cat_wdt = AddCategoryInput(cat_list)
-        self.main_layout.addLayout(self.add_cat_wdt.create())
+        self.main_layout.addLayout(self.add_cat_wdt.create_input())
 
         self.add_button = QtWidgets.QPushButton('Добавить')
         self.main_layout.addWidget(self.add_button)
@@ -89,7 +89,7 @@ class EditCategoryWidget(QtWidgets.QDialog):
         
         self.main_layout.addWidget(QtWidgets.QLabel("Удаление категории"))
         self.del_cat_wdt = DeleteCategoryInput(cat_list)
-        self.main_layout.addLayout(self.del_cat_wdt.create())
+        self.main_layout.addLayout(self.del_cat_wdt.create_input())
         
         self.delete_button = QtWidgets.QPushButton('Удалить')
         self.main_layout.addWidget(self.delete_button)
@@ -119,9 +119,3 @@ class EditCategoryWidget(QtWidgets.QDialog):
             except IndexError as ex:
                 QtWidgets.QMessageBox.critical(self, 'Ошибка', str(ex))
         self.delete_category_button_clicked = delete_category_button_clicked
-
-
-
-if __name__ == "__main__":
-    cat_list = ['Молоко, 2', 'Хлеб, 1']
-    add_cat = AddCategoryWidget()

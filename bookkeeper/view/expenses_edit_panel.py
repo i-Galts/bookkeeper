@@ -1,7 +1,7 @@
 import sys
 from PySide6 import QtWidgets, QtGui
 
-def widget_with_label(text, widget):
+def widget_with_label(text, widget) -> QtWidgets.QHBoxLayout:
     hl = QtWidgets.QHBoxLayout()
     hl.addWidget(QtWidgets.QLabel(text))
     hl.addWidget(widget)
@@ -20,11 +20,11 @@ class AmountEdit(QtWidgets.QWidget):
             self.amount
         )
 
-    def create(self) -> QtWidgets.QHBoxLayout:
+    def create_edit(self):
         return self.layout
     
-    def get_amount(self) -> int:
-        return int(self.amount.text()) or 0
+    def get_amount(self) -> str:
+        return self.amount.text() or ''
     
 class CommentEdit(QtWidgets.QWidget):
     def __init__(self, *args, **kwargs):
@@ -38,7 +38,7 @@ class CommentEdit(QtWidgets.QWidget):
             self.comment_edit
         )
 
-    def create(self) -> QtWidgets.QHBoxLayout:
+    def create_edit(self):
         return self.layout
     
     def get_comment(self) -> str:
@@ -57,29 +57,26 @@ class CategoryChoice(QtWidgets.QWidget):
             self.combobox
         )
 
-    def create(self) -> QtWidgets.QHBoxLayout:
+    def create_choice(self) -> QtWidgets.QHBoxLayout:
         return self.category_choice
     
     def get_category(self) -> str:
         return self.combobox.currentText()
     
-    def set_first(self) -> None:
-        self.combobox.setCurrentIndex(0)
+# if __name__ == "__main__":
+#     app = QtWidgets.QApplication(sys.argv)
+#     window = QtWidgets.QMainWindow()
+#     window.resize(300, 300)
+#     central_widget = QtWidgets.QTabWidget()
+#     window.setCentralWidget(central_widget)
+#     amount_edit = AmountEdit().create()
+#     category_choice = CategoryChoice().create()
 
-if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
-    window = QtWidgets.QMainWindow()
-    window.resize(300, 300)
-    central_widget = QtWidgets.QTabWidget()
-    window.setCentralWidget(central_widget)
-    amount_edit = AmountEdit().create()
-    category_choice = CategoryChoice().create()
+#     vertical_layout = QtWidgets.QVBoxLayout()
+#     vertical_layout.addLayout(amount_edit)
+#     vertical_layout.addLayout(category_choice)
 
-    vertical_layout = QtWidgets.QVBoxLayout()
-    vertical_layout.addLayout(amount_edit)
-    vertical_layout.addLayout(category_choice)
+#     central_widget.setLayout(vertical_layout)
+#     window.show()
 
-    central_widget.setLayout(vertical_layout)
-    window.show()
-
-    sys.exit(app.exec())
+#     sys.exit(app.exec())

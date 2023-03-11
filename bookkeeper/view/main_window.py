@@ -12,14 +12,6 @@ from bookkeeper.view.expenses_edit_panel import AmountEdit, CommentEdit, Categor
 
 from bookkeeper.view.category_edit_window import EditCategoryWidget
 
-def catch_error(widget, handler):
-    def inner(*args, **kwargs):
-        try:
-            handler(*args, **kwargs)
-        except ValidationError as ex:
-            QtWidgets.QMessageBox.critical(widget, 'Ошибка', str(ex))
-    return inner
-
 class BookkeeperMainWindow(QtWidgets.QMainWindow):
     """
     Класс главного окна. Детали интерфейса описаны
@@ -38,25 +30,23 @@ class BookkeeperMainWindow(QtWidgets.QMainWindow):
         self.vertical_layout.addWidget(QtWidgets.QLabel("Последние расходы"))
         self.expenses_table_layout = QtWidgets.QStackedLayout()
         self.expenses_table = ExpensesTable([])
-        self.expenses_table_layout.addWidget(self.expenses_table.create())
+        self.expenses_table_layout.addWidget(self.expenses_table.create_table())
         self.vertical_layout.addLayout(self.expenses_table_layout)
         self.delete_expense_button = QtWidgets.QPushButton("Удалить последнюю запись")
         self.vertical_layout.addWidget(self.delete_expense_button)
 
         # self.vertical_layout.addWidget(QtWidgets.QLabel("Бюджет"))
-        self.budget_table_layout = QtWidgets.QStackedLayout()
-        self.budget_table = BudgetTable([], [], [])
-        self.budget_table_layout.addWidget(self.budget_table.create_table())
-        self.budget_table.register_show_budget_button(
-                                            self.refresh_budget_table)
-        self.show_budget_button = self.budget_table.create_show_budget_button()
+        # self.budget_table_layout = QtWidgets.QStackedLayout()
+        # self.budget_table = BudgetTable([], [], [])
+        # self.budget_table_layout.addWidget(self.budget_table.create())
+        # self.budget_table.register_show_budget_button(
+        #                                     self.refresh_budget_table)
+        # self.budget_cat_choice = self.budget_table.create_cat_choice()
+        # self.show_budget_button = self.budget_table.create_show_budget_button()
 
         self.amount_edit = AmountEdit()
         self.comment_edit = CommentEdit()
 
-        # self.button_layout = QtWidgets.QHBoxLayout()
-
-        # self.vertical_layout.addLayout(self.button_layout)
         self.central_widget.setLayout(self.vertical_layout)
 
     def create_menu(self):
@@ -80,9 +70,9 @@ class BookkeeperMainWindow(QtWidgets.QMainWindow):
                            self.add_category_button_clicked,
                            self.delete_category_button_clicked)
     
-    def refresh_expenses_table(self, exp_list: list[str]):
+    def refresh_expenses_table(self, exp_list: list[list[str]]):
         self.expenses_table = ExpensesTable(exp_list)
-        self.expenses_table_layout.addWidget(self.expenses_table.create())
+        self.expenses_table_layout.addWidget(self.expenses_table.create_table())
         p = (self.expenses_table_layout.currentIndex() + 1) % self.expenses_table_layout.count()
         self.expenses_table_layout.setCurrentIndex(p)
 
@@ -99,28 +89,10 @@ class BookkeeperMainWindow(QtWidgets.QMainWindow):
         p = (self.budget_table_layout.currentIndex() + 1) % self.budget_table_layout.count()
         self.budget_table_layout.setCurrentIndex(p)
 
-    # def create_budget_table(self):
-    #     self.vertical_layout.addWidget(QtWidgets.QLabel("Бюджет"))
-    #     self.budget_widget = BudgetWidget()
-    #     data = [
-    #         ['705.43', '1000'],
-    #         ['6719.43', '7000'],
-    #         ['10592.96', '30000']
-    #     ]
-    #     self.budget_widget.set_data(data)
-    #     self.budget_widget.resize(300, 300)
-    #     self.vertical_layout.addWidget(self.budget_widget.create())
-
-    # def refresh_budget_table(self, bud_list: list[str]):
-    #     self.budget_table = BudgetTable(bud_list, self.cat_list)
-    #     self.budget_table_layout.addWidget(self.expenses_table.create())
-    #     p = (self.budget_table_layout.currentIndex() + 1) % self.budget_table_layout.count()
-    #     self.budget_table_layout.setCurrentIndex(p)
-
     def create_expense_edit_panel(self):
-        self.vertical_layout.addLayout(self.amount_edit.create())
-        self.vertical_layout.addLayout(self.comment_edit.create())
-        self.vertical_layout.addLayout(self.cat_choice.create())
+        self.vertical_layout.addLayout(self.amount_edit.create_edit())
+        self.vertical_layout.addLayout(self.comment_edit.create_edit())
+        self.vertical_layout.addLayout(self.cat_choice.create_choice())
         self.add_expense_button = QtWidgets.QPushButton("Добавить")
         self.vertical_layout.addWidget(self.add_expense_button)
         self.add_expense_button.clicked.connect(
@@ -173,9 +145,3 @@ class BookkeeperMainWindow(QtWidgets.QMainWindow):
             except IndexError as ex:
                 QtWidgets.QMessageBox.critical(self, 'Ошибка', str(ex))
         self.delete_expense_button_clicked = delete_expense_button_clicked
-
-if __name__ == "__main__":
-    app = QtWidgets.QApplication(sys.argv)
-    window = MainWindow()
-    window.show()
-    sys.exit(app.exec())

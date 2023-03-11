@@ -3,6 +3,7 @@
 """
 from dataclasses import dataclass
 
+
 @dataclass
 class Budget:
     """
@@ -17,6 +18,6 @@ class Budget:
     comment: str = ''
     pk: int = 0
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f'{self.category}, {self.period},' \
                 f' {self.amount}, {self.comment}'

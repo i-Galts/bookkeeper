@@ -3,7 +3,9 @@
 """
 from PySide6 import QtWidgets, QtGui
 
-def widget_with_label(text, widget) \
+
+def widget_with_label(text: str, 
+                      widget: QtWidgets.QWidget) \
                 -> QtWidgets.QHBoxLayout:
     """
     Именованный виджет.
@@ -13,6 +15,7 @@ def widget_with_label(text, widget) \
     horizontal_layout.addWidget(QtWidgets.QLabel(text))
     horizontal_layout.addWidget(widget)
     return horizontal_layout
+
 
 class AmountEdit(QtWidgets.QWidget):
     """
@@ -25,16 +28,18 @@ class AmountEdit(QtWidgets.QWidget):
         self.amount.setPlaceholderText('0')
         self.amount.setValidator(QtGui.QDoubleValidator(0.0, 1.0E8, 2, self))
 
-        self.layout = widget_with_label(
+    def create_edit(self) -> QtWidgets.QHBoxLayout:
+        layout = widget_with_label(
             'Сумма',
             self.amount
         )
+        return layout
 
-    def create_edit(self):
-        return self.layout
+    def get_amount(self) -> int:
+        if self.amount.text() == '':
+            return 0
+        return int(self.amount.text())
 
-    def get_amount(self) -> str:
-        return self.amount.text() or ''
 
 class CommentEdit(QtWidgets.QWidget):
     """
@@ -46,16 +51,16 @@ class CommentEdit(QtWidgets.QWidget):
         self.comment_edit = QtWidgets.QLineEdit()
         self.comment_edit.setPlaceholderText('введите комментарий')
 
-        self.layout = widget_with_label(
+    def create_edit(self) -> QtWidgets.QHBoxLayout:
+        layout = widget_with_label(
             'Комментарий',
             self.comment_edit
         )
-
-    def create_edit(self):
-        return self.layout
+        return layout
 
     def get_comment(self) -> str:
         return self.comment_edit.text() or ''
+
 
 class CategoryChoice(QtWidgets.QWidget):
     """

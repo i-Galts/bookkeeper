@@ -8,6 +8,7 @@ import sqlite3
 
 from bookkeeper.repository.abstract_repository import AbstractRepository, T
 
+
 class SQLiteRepository(AbstractRepository[T]):
     """
     Репозиторий, работающий с базой данных.
@@ -42,7 +43,7 @@ class SQLiteRepository(AbstractRepository[T]):
         records = []
         if where is None:
             with sqlite3.connect(self.db_file,
-                             detect_types=sqlite3.PARSE_DECLTYPES) as con:
+                                 detect_types=sqlite3.PARSE_DECLTYPES) as con:
                 cur = con.cursor()
                 cur.execute('PRAGMA foreign_keys = ON')
                 cur.execute(
@@ -84,7 +85,6 @@ class SQLiteRepository(AbstractRepository[T]):
     #                                   comment='Длинное-предлинное сообщение')
     # sqlrepo_exp.add(other_exp)
     # sqlrepo_exp.add(one_more_exp)
-
 
     # sqlrepo_cat = SQLiteRepository('category_repo.db', Category)
     # print(sqlrepo_cat.table_name)

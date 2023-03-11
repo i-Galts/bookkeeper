@@ -3,12 +3,14 @@
 """
 from PySide6 import QtWidgets
 
+
 class ExpensesTable(QtWidgets.QTabWidget):
     """
     Класс таблицы. Описан метод заполнения в
     соответствии с переданным списком расходов cat_list.
     """
-    def __init__(self, exp_list: list[list[str]], *args, **kwargs):
+    def __init__(self, exp_list: list[list[str]], 
+                 *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.expense_list = exp_list
@@ -46,8 +48,7 @@ class ExpensesTable(QtWidgets.QTabWidget):
             for j, x in enumerate(row):
                 self.expenses_table.setItem(
                     i, j,
-                    QtWidgets.QTableWidgetItem(x.capitalize())
-            )
+                    QtWidgets.QTableWidgetItem(x.capitalize()))
 
     def create_table(self) -> QtWidgets.QTableWidget:
         return self.expenses_table

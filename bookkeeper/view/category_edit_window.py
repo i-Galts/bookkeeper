@@ -13,6 +13,7 @@ from PySide6 import QtWidgets, QtCore
 #             return
 #     return inner
 
+
 class AddCategoryInput(QtWidgets.QWidget):
     """
     Класс, описывающий строку с добавлением новой категории.
@@ -54,6 +55,7 @@ class AddCategoryInput(QtWidgets.QWidget):
         """
         return self.horiz_layout
 
+
 class DeleteCategoryInput(QtWidgets.QWidget):
     """
     Класс, описывающий строку с удалением категории.
@@ -87,13 +89,14 @@ class DeleteCategoryInput(QtWidgets.QWidget):
         """
         return self.horiz_layout
 
+
 class EditCategoryWidget(QtWidgets.QDialog):
     """
     Главный класс диалогового окна.
     """
     def __init__(self, cat_list: list[str],
-                 signal_add_cat: Callable,
-                 signal_delete_cat: Callable,
+                 signal_add_cat: Callable[[str, str], None],
+                 signal_delete_cat: Callable[[None], None],
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -127,12 +130,12 @@ class EditCategoryWidget(QtWidgets.QDialog):
 
     @QtCore.Slot()
     def register_category_adder(self,
-                               handler: Callable[[int, str], None]):
+                                handler: Callable[[str, str], None]) -> None:
         """
         Принимает функцию, привязываемую к нажатию
         на кнопку добавления категории.
         """
-        def add_category_button_clicked():
+        def add_category_button_clicked() -> None:
             try:
                 handler(self.add_cat_wdt.get_cat_name(),
                         self.add_cat_wdt.get_parent())
@@ -142,12 +145,12 @@ class EditCategoryWidget(QtWidgets.QDialog):
 
     @QtCore.Slot()
     def register_category_deleter(self,
-                                  handler: Callable[[None], None]):
+                                  handler: Callable[[None], None]) -> None:
         """
         Принимает функцию, привязываемую к нажатию
         на кнопку удаления категории.
         """
-        def delete_category_button_clicked():
+        def delete_category_button_clicked() -> None:
             try:
                 handler()
             except IndexError as ex:

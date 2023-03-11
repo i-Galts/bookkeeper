@@ -10,6 +10,7 @@ from bookkeeper.repository.sqlite_repository import SQLiteRepository
 from bookkeeper.repository.memory_repository import MemoryRepository
 from bookkeeper.view.main_window import BookkeeperMainWindow
 
+
 class RepositoryFactory:
     """
     Фабрика репозиториев. При создании передается
@@ -36,6 +37,7 @@ class RepositoryFactory:
         """
         return self.repo_dict[model_cls]
 
+
 class AbstractView(Protocol):
     """
     Класс абстрактного View. Класс Bookkeeper не
@@ -55,7 +57,7 @@ class AbstractView(Protocol):
 
     def register_cat_deleter(
             self,
-            handler: Callable[[None], None]):
+            handler: Callable[[None], None]) -> None:
         """
         Регистратор удаления категории расходов.
         """
@@ -84,15 +86,16 @@ class AbstractView(Protocol):
         Регистратор кнопки удаления записи о расходах.
         """
 
-    def set_budget_list(self, exp_list: list[Budget]) -> None:
-        """
-        Устанавливает данные о бюджете.
-        """
+    # def set_budget_list(self, exp_list: list[Budget]) -> None:
+    #     """
+    #     Устанавливает данные о бюджете.
+    #     """
 
     def create_expense_edit_panel(self) -> None:
         """
         Добавляет панель редактирования записей о расходах.
         """
+
 
 class Bookkeeper:
     """
@@ -138,7 +141,7 @@ class Bookkeeper:
         self.exps.append(exp)
         self.view.set_expense_list(self.exps)
 
-    def delete_expense(self):
+    def delete_expense(self) -> None:
         """
         Удаляет последнюю запись о расходах.
         """
@@ -149,7 +152,7 @@ class Bookkeeper:
         self.view.set_expense_list(self.exps)
         self.expense_repository.delete(last_pk)
 
-    def add_category(self, name: str, parent: str):
+    def add_category(self, name: str, parent: str) -> None:
         """
         Добавляет новую категорию после ввода
         названия name и выбора родительсокй категории parent.

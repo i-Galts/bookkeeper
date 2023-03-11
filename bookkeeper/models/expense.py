@@ -24,6 +24,7 @@ class Expense:
     comment: str = ''
     pk: int = 0
 
-    def __repr__(self):
-        return f'{str(self.added_date.date())}, {str(self.expense_date.date()).strip()},' \
+    def __repr__(self) -> str:
+        return f'{str(self.added_date.date())},' \
+                f'{str(self.expense_date.date()).strip()},' \
                 f' {self.amount}, {self.category}, {self.comment}'

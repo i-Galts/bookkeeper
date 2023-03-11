@@ -3,6 +3,7 @@
 """
 from dataclasses import dataclass
 
+
 @dataclass
 class Category:
     """
@@ -14,7 +15,7 @@ class Category:
     parent: str | None = None
     pk: int = 0
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f'{self.name}, {self.parent}'
 
     # def get_parent(self,

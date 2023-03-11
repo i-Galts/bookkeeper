@@ -10,6 +10,7 @@
 from abc import ABC, abstractmethod
 from typing import Generic, TypeVar, Protocol, Any
 
+
 class Model(Protocol):  # pylint: disable=too-few-public-methods
     """
     Модель должна содержать атрибут pk
@@ -57,4 +58,3 @@ class AbstractRepository(ABC, Generic[T]):
     @abstractmethod
     def delete(self, pk: int) -> None:
         """ Удалить запись """
-        

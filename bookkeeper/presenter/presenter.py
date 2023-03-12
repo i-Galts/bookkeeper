@@ -86,10 +86,10 @@ class AbstractView(Protocol):
         Регистратор кнопки удаления записи о расходах.
         """
 
-    # def set_budget_list(self, exp_list: list[Budget]) -> None:
-    #     """
-    #     Устанавливает данные о бюджете.
-    #     """
+    def set_budget_list(self, exp_list: list[Budget]) -> None:
+        """
+        Устанавливает данные о бюджете.
+        """
 
     def create_expense_edit_panel(self) -> None:
         """
@@ -123,9 +123,9 @@ class Bookkeeper:
         self.view.set_expense_list(self.exps)
         self.view.create_delete_expense_button()
 
-        # self.budget_repository = repository_factory.get(Budget)
-        # self.buds = self.budget_repository.get_all()
-        # self.view.set_budget_list(self.buds)
+        self.budget_repository = repository_factory.get(Budget)
+        self.buds = self.budget_repository.get_all()
+        self.view.set_budget_list(self.buds)
 
         self.view.create_expense_edit_panel()
 
@@ -145,7 +145,7 @@ class Bookkeeper:
         """
         Удаляет последнюю запись о расходах.
         """
-        if len(self.exps) == 0:
+        if not self.exps:
             raise IndexError('Нет записей о расходах!')
         last_pk = len(self.exps)
         self.exps.pop()
@@ -162,18 +162,21 @@ class Bookkeeper:
         cat = Category(name=name, parent=parent)
         self.category_repository.add(cat)
         self.cats.append(cat)
+        self.cat_names = [cat.name.capitalize() for cat in self.cats]
         self.view.set_category_list(self.cats)
 
-    def delete_category(self) -> None:
+    def delete_category(self, cat: str) -> None:
         """
         Удаляет выбранную категорию.
         """
-        if len(self.cats) == 0:
+        if not self.cats:
             raise IndexError('Нет категорий!')
-        last_pk = len(self.cats)
-        self.cats.pop()
+        cur_pk = self.cat_names.index(cat.capitalize())
+        self.category_repository.delete(cur_pk + 1)
+        self.cats.pop(cur_pk)
+        self.cat_names = [cat.name.capitalize() for cat in self.cats]
         self.view.set_category_list(self.cats)
-        self.category_repository.delete(last_pk)
+        # self.cats = self.category_repository.get_all()
 
 
 if __name__ == "__main__":

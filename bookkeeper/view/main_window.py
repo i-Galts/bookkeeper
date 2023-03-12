@@ -8,7 +8,7 @@ from bookkeeper.models.category import Category
 from bookkeeper.models.expense import Expense
 from bookkeeper.models.budget import Budget
 from bookkeeper.view.expenses_table import ExpensesTable
-# from bookkeeper.view.budget_widget import BudgetTable
+from bookkeeper.view.budget_widget import BudgetWidget
 from bookkeeper.view.expenses_edit_panel import AmountEdit, CommentEdit, CategoryChoice
 from bookkeeper.view.category_edit_window import EditCategoryWidget
 
@@ -36,7 +36,10 @@ class BookkeeperMainWindow(QtWidgets.QMainWindow):
         self.delete_expense_button = QtWidgets.QPushButton("Удалить последнюю запись")
         self.vertical_layout.addWidget(self.delete_expense_button)
 
-        # self.vertical_layout.addWidget(QtWidgets.QLabel("Бюджет"))
+        self.budget_layout = QtWidgets.QVBoxLayout()
+        self.budget_layout.addWidget(QtWidgets.QLabel("Бюджет"))
+        self.vertical_layout.addLayout(self.budget_layout)
+
         # self.budget_table_layout = QtWidgets.QStackedLayout()
         # self.budget_table = BudgetTable([], [], [])
         # self.budget_table_layout.addWidget(self.budget_table.create())
@@ -80,6 +83,16 @@ class BookkeeperMainWindow(QtWidgets.QMainWindow):
         EditCategoryWidget(self.cat_list,
                            self.add_category_button_clicked,
                            self.delete_category_button_clicked)
+        
+    @QtCore.Slot()
+    def edit_budget_button_clicked(self) -> None:
+        """
+        Обработчик нажатия на кнопку "Правка категорий".
+        Открывает диалоговое окно.
+        """
+        EditBudgetWidget(self.cat_list,
+                           self.add_category_button_clicked,
+                           self.delete_category_button_clicked)
 
     def refresh_expenses_table(self, exp_list: list[list[str]]) -> None:
         """
@@ -88,6 +101,7 @@ class BookkeeperMainWindow(QtWidgets.QMainWindow):
         self.expenses_table = ExpensesTable(exp_list)
         self.expenses_table_layout.addWidget(
                             self.expenses_table.create_table())
+        # print(self.expenses_table.create_table())
         index = (self.expenses_table_layout.currentIndex() + 1) % \
                  self.expenses_table_layout.count()
         self.expenses_table_layout.setCurrentIndex(index)
@@ -96,18 +110,35 @@ class BookkeeperMainWindow(QtWidgets.QMainWindow):
         self.delete_expense_button.clicked.connect(
                                                 self.delete_expense_button_clicked)
 
-    # def refresh_budget_table(self) -> None:
-    #     """
-    #     Перерисовка таблицы с бюджетом.
-    #     """
-    #     self.budget_table = BudgetTable(self.cat_list, self.exp_list, self.bud_list)
-    #     self.vertical_layout.addLayout(self.budget_table.create_cat_choice())
-    #     self.budget_table_layout.addWidget(self.budget_table.create_table())
-    #     self.vertical_layout.addWidget(self.show_budget_button)
-    #     self.vertical_layout.addLayout(self.budget_table_layout)
-    #     index = (self.budget_table_layout.currentIndex() + 1) % \
-    #              self.budget_table_layout.count()
-    #     self.budget_table_layout.setCurrentIndex(index)
+    def create_budget_table(self) -> None:
+        """
+        Отрисовка таблицы с бюджетом.
+        """
+        self.budget_wid = BudgetWidget(self.cat_list, self.exp_list, self.bud_list)
+        self.budget_layout.addLayout(self.budget_wid.create_cat_choice())
+        self.stacked_bud_table = QtWidgets.QStackedLayout(parent=self.budget_layout)
+        self.stacked_bud_table.addWidget(self.budget_wid.create_table())
+        self.budget_layout.addLayout(self.stacked_bud_table)
+        self.show_budget_button = QtWidgets.QPushButton("Показать бюджет")
+        self.budget_layout.addWidget(self.show_budget_button)
+        self.show_budget_button.clicked.connect(
+                                self.show_budget_button_clicked)
+        
+    def show_budget_button_clicked(self):
+        chosen_cat = self.budget_wid.cat_choice.get_category()
+        self.budget_wid.fill_columns(chosen_cat)
+        self.stacked_bud_table.addWidget(self.budget_wid.create_table())
+        index = (self.stacked_bud_table.currentIndex() + 1) % \
+                 self.stacked_bud_table.count()
+        self.stacked_bud_table.setCurrentIndex(index)
+        
+        # self.vertical_layout.addLayout(self.budget_table.create_cat_choice())
+        # self.budget_table_layout.addWidget(self.budget_table.create_table())
+        # self.vertical_layout.addWidget(self.show_budget_button)
+        # self.vertical_layout.addLayout(self.budget_table_layout)
+        # index = (self.budget_table_layout.currentIndex() + 1) % \
+        #          self.budget_table_layout.count()
+        # self.budget_table_layout.setCurrentIndex(index)
 
     def create_expense_edit_panel(self) -> None:
         """
@@ -142,12 +173,12 @@ class BookkeeperMainWindow(QtWidgets.QMainWindow):
         self.exp_list = [repr(exp).split(',') for exp in reversed(exp_list)]
         self.refresh_expenses_table(self.exp_list)
 
-    # def set_budget_list(self, bud_list: list[Budget]) -> None:
-    #     """
-    #     Установка переданного списка бюджета.
-    #     """
-    #     self.bud_list = [repr(bud) for bud in bud_list]
-    #     self.refresh_budget_table()
+    def set_budget_list(self, bud_list: list[Budget]) -> None:
+        """
+        Установка переданного списка бюджета.
+        """
+        self.bud_list = [repr(bud) for bud in bud_list]
+        self.create_budget_table()
 
     @QtCore.Slot()
     def register_cat_adder(self,
@@ -161,7 +192,7 @@ class BookkeeperMainWindow(QtWidgets.QMainWindow):
 
     @QtCore.Slot()
     def register_cat_deleter(self,
-                             handler: Callable[[None], None]) -> None:
+                             handler: Callable[[str], None]) -> None:
         """
         Регистрация действий при нажатии
         на кнопку удаления категории.

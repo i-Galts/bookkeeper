@@ -6,6 +6,7 @@ from inspect import get_annotations
 
 import sqlite3
 
+from bookkeeper.models.budget import Budget
 from bookkeeper.repository.abstract_repository import AbstractRepository, T
 
 
@@ -63,6 +64,7 @@ class SQLiteRepository(AbstractRepository[T]):
         pass
 
     def delete(self, pk: int) -> None:
+        print(pk, 'ololo')
         with sqlite3.connect(self.db_file,
                              detect_types=sqlite3.PARSE_DECLTYPES) as con:
             cur = con.cursor()
@@ -72,7 +74,7 @@ class SQLiteRepository(AbstractRepository[T]):
                 )
         con.close()
 
-# if __name__ == "__main__":
+if __name__ == "__main__":
     # sqlrepo_exp = SQLiteRepository('expense_repo.db', Expense)
     # print(sqlrepo_exp.table_name)
     # print(sqlrepo_exp.fields)
@@ -90,28 +92,18 @@ class SQLiteRepository(AbstractRepository[T]):
     # print(sqlrepo_cat.table_name)
     # print(sqlrepo_cat.fields)
 
-    # cat = Category(name='Продукты')
+    # cat = Category(name='Фрукты')
     # sqlrepo_cat.add(cat)
 
-    # other_cat = Category(name='Молоко', parent=1)
-    # one_more_cat = Category(name='Хлеб', parent=1)
+    # other_cat = Category(name='Яблоки', parent='Фрукты')
     # sqlrepo_cat.add(other_cat)
-    # sqlrepo_cat.add(one_more_cat)
 
-    # again = Category(name='Книги', parent=2)
-    # sqlrepo_cat.add(again)
+    sqlrepo_bud = SQLiteRepository('budget_repo.db', Budget)
+    print(sqlrepo_bud.table_name)
+    print(sqlrepo_bud.fields)
 
-    # sqlrepo_bud = SQLiteRepository('budget_repo.db', Budget)
-    # print(sqlrepo_bud.table_name)
-    # print(sqlrepo_bud.fields)
+    bud = Budget(category='Фрукты', amount=500, period=7)
+    sqlrepo_bud.add(bud)
 
-    # bud = Budget(category='Шоколад', amount=70, period=1)
-    # sqlrepo_bud.add(bud)
-
-    # other_bud = Budget(category='Молоко', amount=300, period=30)
-    # one_more_bud = Budget(category='Бублики', amount=350, period=7)
-    # sqlrepo_bud.add(other_bud)
-    # sqlrepo_bud.add(one_more_bud)
-
-    # again = Budget(category='Продукты', amount=6000, period=30)
-    # sqlrepo_bud.add(again)
+    other_bud = Budget(category='Яблоки', amount=600, period=30)
+    sqlrepo_bud.add(other_bud)

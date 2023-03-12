@@ -145,14 +145,14 @@ class EditCategoryWidget(QtWidgets.QDialog):
 
     @QtCore.Slot()
     def register_category_deleter(self,
-                                  handler: Callable[[None], None]) -> None:
+                                  handler: Callable[[str], None]) -> None:
         """
         Принимает функцию, привязываемую к нажатию
         на кнопку удаления категории.
         """
         def delete_category_button_clicked() -> None:
             try:
-                handler()
+                handler(self.del_cat_wdt.get_cat_name())
             except IndexError as ex:
                 QtWidgets.QMessageBox.critical(self, 'Ошибка', str(ex))
         self.delete_category_button_clicked = delete_category_button_clicked

@@ -64,7 +64,6 @@ class SQLiteRepository(AbstractRepository[T]):
         pass
 
     def delete(self, pk: int) -> None:
-        print(pk, 'ololo')
         with sqlite3.connect(self.db_file,
                              detect_types=sqlite3.PARSE_DECLTYPES) as con:
             cur = con.cursor()

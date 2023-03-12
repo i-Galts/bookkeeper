@@ -6,21 +6,21 @@ from bookkeeper.view.expenses_edit_panel \
 def test_amount_edit_normal_input(qtbot):
     widget = AmountEdit()
     qtbot.keyClicks(widget.amount, '1234567890')
-    assert widget.get_amount() == '1234567890'
+    assert widget.get_amount() == 1234567890
 
 def test_amount_edit_empty_input(qtbot):
     widget = AmountEdit()
-    assert widget.get_amount() == ''
+    assert widget.get_amount() == 0
 
 def test_amount_edit_negative_input(qtbot):
     widget = AmountEdit()
     qtbot.keyClicks(widget.amount, '-1')
-    assert widget.get_amount() == '1'
+    assert widget.get_amount() == 1
 
 def test_amount_edit_nonumber_input(qtbot):
     widget = AmountEdit()
     qtbot.keyClicks(widget.amount, 'abc')
-    assert widget.get_amount() == ''
+    assert widget.get_amount() == 0
 
 def test_comment_edit_normal_input(qtbot):
     widget = CommentEdit()

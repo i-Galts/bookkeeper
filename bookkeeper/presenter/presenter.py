@@ -151,6 +151,7 @@ class Bookkeeper:
         self.exps.pop()
         self.view.set_expense_list(self.exps)
         self.expense_repository.delete(last_pk)
+        self.view.set_category_list(self.cats)
 
     def add_category(self, name: str, parent: str) -> None:
         """
@@ -183,7 +184,7 @@ if __name__ == "__main__":
 
     app = QtWidgets.QApplication(sys.argv)
     window = BookkeeperMainWindow()
-    repo_factory = RepositoryFactory(SQLiteRepository)
+    repo_factory = RepositoryFactory(MemoryRepository)
     bookkeeper = Bookkeeper(window, repo_factory)
     window.show()
     sys.exit(app.exec())

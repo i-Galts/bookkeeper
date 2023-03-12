@@ -20,6 +20,7 @@ class BookkeeperMainWindow(QtWidgets.QMainWindow):
     """
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
+        
         self.setWindowTitle("PyBookKeeper App")
         self.resize(800, 900)
         self.central_widget = QtWidgets.QTabWidget()
@@ -39,14 +40,6 @@ class BookkeeperMainWindow(QtWidgets.QMainWindow):
         self.budget_layout = QtWidgets.QVBoxLayout()
         self.budget_layout.addWidget(QtWidgets.QLabel("Бюджет"))
         self.vertical_layout.addLayout(self.budget_layout)
-
-        # self.budget_table_layout = QtWidgets.QStackedLayout()
-        # self.budget_table = BudgetTable([], [], [])
-        # self.budget_table_layout.addWidget(self.budget_table.create())
-        # self.budget_table.register_show_budget_button(
-        #                                     self.refresh_budget_table)
-        # self.budget_cat_choice = self.budget_table.create_cat_choice()
-        # self.show_budget_button = self.budget_table.create_show_budget_button()
 
         self.amount_edit = AmountEdit()
         self.comment_edit = CommentEdit()
@@ -74,6 +67,10 @@ class BookkeeperMainWindow(QtWidgets.QMainWindow):
         self.exit_action.triggered.connect(self.exit_app)
         self.file_menu.addAction(self.exit_action)
 
+        self.update_action = QtGui.QAction("Обновить", self)
+        self.update_action.triggered.connect(self.update_app)
+        self.file_menu.addAction(self.update_action)
+
     @QtCore.Slot()
     def edit_category_button_clicked(self) -> None:
         """
@@ -84,15 +81,15 @@ class BookkeeperMainWindow(QtWidgets.QMainWindow):
                            self.add_category_button_clicked,
                            self.delete_category_button_clicked)
         
-    @QtCore.Slot()
-    def edit_budget_button_clicked(self) -> None:
-        """
-        Обработчик нажатия на кнопку "Правка категорий".
-        Открывает диалоговое окно.
-        """
-        EditBudgetWidget(self.cat_list,
-                           self.add_category_button_clicked,
-                           self.delete_category_button_clicked)
+    # @QtCore.Slot()
+    # def edit_budget_button_clicked(self) -> None:
+    #     """
+    #     Обработчик нажатия на кнопку "Правка категорий".
+    #     Открывает диалоговое окно.
+    #     """
+    #     EditBudgetWidget(self.cat_list,
+    #                        self.add_category_button_clicked,
+    #                        self.delete_category_button_clicked)
 
     def refresh_expenses_table(self, exp_list: list[list[str]]) -> None:
         """
@@ -101,7 +98,6 @@ class BookkeeperMainWindow(QtWidgets.QMainWindow):
         self.expenses_table = ExpensesTable(exp_list)
         self.expenses_table_layout.addWidget(
                             self.expenses_table.create_table())
-        # print(self.expenses_table.create_table())
         index = (self.expenses_table_layout.currentIndex() + 1) % \
                  self.expenses_table_layout.count()
         self.expenses_table_layout.setCurrentIndex(index)
@@ -146,7 +142,8 @@ class BookkeeperMainWindow(QtWidgets.QMainWindow):
         """
         self.vertical_layout.addLayout(self.amount_edit.create_edit())
         self.vertical_layout.addLayout(self.comment_edit.create_edit())
-        self.vertical_layout.addLayout(self.cat_choice.create_choice())
+        self.cat_choice_panel = self.cat_choice.create_choice()
+        self.vertical_layout.addLayout(self.cat_choice_panel)
         self.add_expense_button = QtWidgets.QPushButton("Добавить")
         self.vertical_layout.addWidget(self.add_expense_button)
         self.add_expense_button.clicked.connect(
@@ -154,6 +151,27 @@ class BookkeeperMainWindow(QtWidgets.QMainWindow):
 
     def create_window(self) -> QtWidgets.QMainWindow:
         return self
+
+    @QtCore.Slot()
+    def update_app(self) -> None:
+        """
+        Кнопка меню для обновления главного окна приложения.
+        После установки категорий и бюджета в отдельных
+        диалоговых окнах нужно обновить главное окно для
+        отображения внесенных данных.
+        """
+        for i in reversed(range(self.budget_layout.count())):
+            try:
+                self.budget_layout.itemAt(i).widget().setParent(None)
+            except AttributeError:
+                self.budget_layout.itemAt(i).layout().setParent(None)
+        self.create_budget_table()
+
+        self.vertical_layout.removeWidget(self.add_expense_button)
+        self.vertical_layout.removeItem(self.cat_choice_panel)
+        self.cat_choice_panel = self.cat_choice.create_choice()
+        self.vertical_layout.addLayout(self.cat_choice_panel)
+        self.vertical_layout.addWidget(self.add_expense_button)
 
     @QtCore.Slot()
     def exit_app(self) -> None:

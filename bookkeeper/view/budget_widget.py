@@ -49,15 +49,13 @@ class BudgetWidget(QtWidgets.QWidget):
 
         self.budget_table.setEditTriggers(
             QtWidgets.QAbstractItemView.NoEditTriggers)
-        
-        #self.fill_columns(self.cat_choice.get_category())
 
     def fill_columns(self, cat: str) -> None:
         """
         Заполнение таблицы для выбранной
         пользователем категории cat.
         """
-        print(cat)
+        print(self.cat_list)
         if not self.cat_list:
             return
         if not self.exp_list:

@@ -9,7 +9,7 @@ class ExpensesTable(QtWidgets.QTabWidget):
     Класс таблицы. Описан метод заполнения в
     соответствии с переданным списком расходов cat_list.
     """
-    def __init__(self, exp_list: list[list[str]], 
+    def __init__(self, exp_list: list[list[str]],
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
 

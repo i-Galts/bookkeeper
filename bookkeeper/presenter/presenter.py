@@ -91,6 +91,20 @@ class AbstractView(Protocol):
         Устанавливает данные о бюджете.
         """
 
+    def register_bud_adder(
+            self,
+            handler: Callable[[str, str, str], None]) -> None:
+        """
+        Регистратор добавления бюджета.
+        """
+
+    def register_bud_deleter(
+            self,
+            handler: Callable[[str], None]) -> None:
+        """
+        Регистратор удаления бюджета.
+        """
+
     def create_expense_edit_panel(self) -> None:
         """
         Добавляет панель редактирования записей о расходах.
@@ -123,6 +137,8 @@ class Bookkeeper:
         self.view.set_expense_list(self.exps)
         self.view.create_delete_expense_button()
 
+        self.view.register_bud_adder(self.add_budget)
+        self.view.register_bud_deleter(self.delete_budget)
         self.budget_repository = repository_factory.get(Budget)
         self.buds = self.budget_repository.get_all()
         self.view.set_budget_list(self.buds)
@@ -178,6 +194,24 @@ class Bookkeeper:
         self.cat_names = [cat.name.capitalize() for cat in self.cats]
         self.view.set_category_list(self.cats)
         # self.cats = self.category_repository.get_all()
+
+    def add_budget(self, category: str,
+                   period: str, amount: str) -> None:
+        """
+        Добавляет новый бюджет. Указываются желаемая
+        категория расхода, период и сумма бюджета.
+        """
+        bud = Budget(category=category,
+                     period=period, amount=amount)
+        self.budget_repository.add(bud)
+        self.buds.append(bud)
+        self.view.set_budget_list(self.buds)
+
+    def delete_budget(self, cat: str) -> None:
+        """
+        Удаляет бюджет для заданной категории.
+        """
+        pass
 
 
 if __name__ == "__main__":

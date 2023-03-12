@@ -1,7 +1,6 @@
 """
 Виджет таблицы с бюджетом.
 """
-from typing import Callable
 
 from PySide6 import QtWidgets
 
@@ -55,7 +54,6 @@ class BudgetWidget(QtWidgets.QWidget):
         Заполнение таблицы для выбранной
         пользователем категории cat.
         """
-        print(self.cat_list)
         if not self.cat_list:
             return
         if not self.exp_list:
@@ -93,28 +91,7 @@ class BudgetWidget(QtWidgets.QWidget):
                 self.budget_table.setItem(
                         1, i, QtWidgets.QTableWidgetItem(f'{bud_per_day * period: .2f}'))
 
-    def create_show_budget_button(self):
-        """
-        Привязка кнопки для отображения бюджета.
-        """
-        self.show_budget_button = QtWidgets.QPushButton('Показать бюджет')
-        self.show_budget_button.clicked.connect(
-                                self.show_budget_button_clicked)
-        return self.show_budget_button
-
-    def register_show_budget_button(self,
-                                    handler: Callable[[None], None]):
-        """
-        Регистрация действий при нажатии на
-        кнопку для отображения бюджета.
-        """
-        def show_budget_button_clicked():
-            chosen_cat = self.cat_choice.get_category()
-            self.fill_columns(chosen_cat)
-            handler()
-        self.show_budget_button_clicked = show_budget_button_clicked
-
-    def create_table(self):
+    def create_table(self) -> QtWidgets.QTableWidget:
         return self.budget_table
 
     def create_cat_choice(self) -> QtWidgets.QHBoxLayout:

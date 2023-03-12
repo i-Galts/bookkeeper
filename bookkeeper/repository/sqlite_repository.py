@@ -6,7 +6,6 @@ from inspect import get_annotations
 
 import sqlite3
 
-from bookkeeper.models.budget import Budget
 from bookkeeper.repository.abstract_repository import AbstractRepository, T
 
 
@@ -73,7 +72,7 @@ class SQLiteRepository(AbstractRepository[T]):
                 )
         con.close()
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
     # sqlrepo_exp = SQLiteRepository('expense_repo.db', Expense)
     # print(sqlrepo_exp.table_name)
     # print(sqlrepo_exp.fields)
@@ -97,12 +96,12 @@ if __name__ == "__main__":
     # other_cat = Category(name='Яблоки', parent='Фрукты')
     # sqlrepo_cat.add(other_cat)
 
-    sqlrepo_bud = SQLiteRepository('budget_repo.db', Budget)
-    print(sqlrepo_bud.table_name)
-    print(sqlrepo_bud.fields)
+    # sqlrepo_bud = SQLiteRepository('budget_repo.db', Budget)
+    # print(sqlrepo_bud.table_name)
+    # print(sqlrepo_bud.fields)
 
-    bud = Budget(category='Фрукты', amount=500, period=7)
-    sqlrepo_bud.add(bud)
+    # bud = Budget(category='Фрукты', amount=500, period=7)
+    # sqlrepo_bud.add(bud)
 
-    other_bud = Budget(category='Яблоки', amount=600, period=30)
-    sqlrepo_bud.add(other_bud)
+    # other_bud = Budget(category='Яблоки', amount=600, period=30)
+    # sqlrepo_bud.add(other_bud)

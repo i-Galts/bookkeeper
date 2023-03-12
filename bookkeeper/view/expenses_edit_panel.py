@@ -4,7 +4,7 @@
 from PySide6 import QtWidgets, QtGui
 
 
-def widget_with_label(text: str, 
+def widget_with_label(text: str,
                       widget: QtWidgets.QWidget) \
                 -> QtWidgets.QHBoxLayout:
     """

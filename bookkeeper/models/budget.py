@@ -13,8 +13,8 @@ class Budget:
     category - категория расходов.
     """
     category: str = ''
-    period: int = 1
-    amount: int = 1
+    period: str = '1'
+    amount: str = '100'
     comment: str = ''
     pk: int = 0
 

@@ -96,7 +96,7 @@ class EditCategoryWidget(QtWidgets.QDialog):
     """
     def __init__(self, cat_list: list[str],
                  signal_add_cat: Callable[[str, str], None],
-                 signal_delete_cat: Callable[[None], None],
+                 signal_delete_cat: Callable[[str], None],
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -125,8 +125,6 @@ class EditCategoryWidget(QtWidgets.QDialog):
         self.register_category_deleter(signal_delete_cat)
         self.delete_button.clicked.connect(
                                 self.delete_category_button_clicked)
-
-        self.exec()
 
     @QtCore.Slot()
     def register_category_adder(self,

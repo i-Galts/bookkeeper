@@ -116,7 +116,7 @@ class BookkeeperMainWindow(QtWidgets.QMainWindow):
         """
         self.budget_wid = BudgetWidget(self.cat_list, self.exp_list, self.bud_list)
         self.budget_layout.addLayout(self.budget_wid.create_cat_choice())
-        self.stacked_bud_table = QtWidgets.QStackedLayout(parent=self.budget_layout)
+        self.stacked_bud_table = QtWidgets.QStackedLayout(parentLayout=self.budget_layout)
         self.stacked_bud_table.addWidget(self.budget_wid.create_table())
         self.budget_layout.addLayout(self.stacked_bud_table)
         self.show_budget_button = QtWidgets.QPushButton("Показать бюджет")
@@ -129,7 +129,7 @@ class BookkeeperMainWindow(QtWidgets.QMainWindow):
         self.budget_wid.fill_columns(chosen_cat)
         self.stacked_bud_table.addWidget(self.budget_wid.create_table())
         index = self.expenses_table_layout.currentIndex() + 1
-        self.expenses_table_layout.setCurrentIndex(
+        self.stacked_bud_table.setCurrentIndex(
                     index % self.expenses_table_layout.count())
         self.stacked_bud_table.setCurrentIndex(index)
 

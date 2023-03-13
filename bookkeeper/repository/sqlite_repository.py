@@ -21,6 +21,8 @@ class SQLiteRepository(AbstractRepository[T]):
         self.fields.pop('pk')
 
     def add(self, obj: T) -> int:
+        if getattr(obj, 'pk', None) != 0:
+            raise ValueError(f'trying to add object {obj} with filled `pk` attribute')
         names = ', '.join(self.fields.keys())
         qm_line = ', '.join("?" * len(self.fields))
         values = [getattr(obj, x) for x in self.fields]
@@ -37,7 +39,22 @@ class SQLiteRepository(AbstractRepository[T]):
         return obj.pk
 
     def get(self, pk: int) -> T | None:
-        pass
+        obj = None
+        names = ', '.join(self.fields.keys())
+        with sqlite3.connect(self.db_file,
+                             detect_types=sqlite3.PARSE_DECLTYPES) as con:
+            cur = con.cursor()
+            cur.execute('PRAGMA foreign_keys = ON')
+            cur.execute(
+                    f'SELECT {names} from {self.table_name} WHERE ROWID={pk}'
+                )
+            record = cur.fetchone()
+            if record:
+                obj = self.cls(pk=pk)
+                for field, item in zip(self.fields, record):
+                    setattr(obj, field, item)
+        con.close()
+        return obj
 
     def get_all(self, where: dict[str, Any] | None = None) -> list[T]:
         records = []
@@ -60,7 +77,20 @@ class SQLiteRepository(AbstractRepository[T]):
         return records
 
     def update(self, obj: T) -> None:
-        pass
+        pk = obj.pk
+        if not pk:
+            raise ValueError('attempt to update object with unknown primary key')
+        names = '=?, '.join(self.fields.keys()) + '=?'
+        values = [getattr(obj, x) for x in self.fields]
+        with sqlite3.connect(self.db_file,
+                             detect_types=sqlite3.PARSE_DECLTYPES) as con:
+            cur = con.cursor()
+            cur.execute('PRAGMA foreign_keys = ON')
+            cur.execute(
+                f'UPDATE {self.table_name} SET {names} WHERE ROWID={pk}',
+                values
+            )
+        con.close()
 
     def delete(self, pk: int) -> None:
         with sqlite3.connect(self.db_file,
@@ -68,8 +98,17 @@ class SQLiteRepository(AbstractRepository[T]):
             cur = con.cursor()
             cur.execute('PRAGMA foreign_keys = ON')
             cur.execute(
+                f'SELECT Count(*) FROM {self.table_name}'
+            )
+            rows_num, = cur.fetchone()
+            if not rows_num:
+                raise KeyError('the table is empty')
+            elif pk not in range(1, rows_num):
+                raise KeyError('no object with given primary key')
+            else:
+                cur.execute(
                     f'DELETE from {self.table_name} WHERE ROWID={pk}'
-                )
+                    )
         con.close()
 
 # if __name__ == "__main__":

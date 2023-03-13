@@ -1,3 +1,6 @@
+"""
+Тесты для класса абстрактного репозитория
+"""
 from bookkeeper.repository.abstract_repository import AbstractRepository
 
 import pytest
